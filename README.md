@@ -43,12 +43,13 @@ Y-Trainer 是一个旨在增强Y-Agent基础模型能力的大模型训练框架
 
 ## 相关资料：
 
-[Y-Agent Studio官方介绍](http://112.126.109.80/docs)
+[Y-Agent Studio官方介绍](http://www.y-agent.cn/docs)
 
-[Y-Agent 使用说明](http://112.126.109.80/docs/y-agent/quick_start)
+[Y-Agent 使用说明](http://www.y-agent.cn/docs/y-agent/quick_start)
 
-[Y-Squeeze 使用说明](http://112.126.109.80/docs/y-squeeze/introduction)
+[Y-Squeeze 使用说明](http://www.y-agent.cn/docs/y-squeeze/introduction)
 
-[Y-Trainer 介绍](http://112.126.109.80/docs/y-trainer/introduction)
+[Y-Trainer 介绍](http://www.y-agent.cn/docs/y-trainer/introduction)
 
-[Y-Agent Studio官网](http://112.126.109.80)
+[Y-Agent Studio官网](http://www.y-agent.cn)
+
