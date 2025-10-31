@@ -1,0 +1,4 @@
+torch=2.5.1+cu124
+transformers=4.55.2
+peft=0.17.0
+deepspeed=0.17.4
