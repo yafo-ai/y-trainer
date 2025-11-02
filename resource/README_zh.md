@@ -5,9 +5,13 @@
 
 # Y-Trainer
 
-Y-Trainer 是一个面向增强 Y-Agent 基础模型能力的语言模型训练框架。该框架包含以下三个核心组件：继续预训练（Continued Pre-training，简称 CPT）、指令微调（Supervised Fine-tuning，简称 SFT）。
+Y-Trainer 是一个LLM模型微调训练框架。
 
-**计划安排：** 强化学习（Reinforcement Learning，简称 RL）模块将**很快发布**。
+# 特点是：
+1、有效防止SFT的过拟合问题。
+2、有效避免灾难性遗忘，无需通用语料，即可最大程度保留模型的通用能力。
+
+该框架包含以下三个核心组件：继续预训练（Continued Pre-training，简称 CPT）、指令微调（Supervised Fine-tuning，简称 SFT）、强化学习（Reinforcement Learning，简称 RL）模块将**很快发布**。
 
 ## 持续预训练（Continued Pre-training）
 
