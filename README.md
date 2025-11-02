@@ -4,8 +4,13 @@
 ---
 
 # Y-Trainer
+Welcome to Y-Trainer—an advanced training framework designed for LLM fine-tuning.
 
-Y-Trainer is a language model training framework designed to enhance the capabilities of the Y-Agent base model. The framework consists of three components: Continued Pre-training (CPT), Supervised Fine-tuning (SFT):
+# 🎯 Core Advantages:
+
+- 📉 **Precision Targeting of Overfitting**: Expertly optimized to effectively resolve overfitting challenges in SFT.
+
+- 🧩 **Breakthrough the Forgetting Bottleneck**: Excels at preserving the model's generalization capabilities without relying on massive general corpora. It maintains core competencies while enabling specialized enhancement! 🏆
 
 **Schedule:** Reinforcement Learning (RL) will be released **soon**.
 
