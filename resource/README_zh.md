@@ -67,6 +67,25 @@ bash scripts/pretrain_ds.sh
 # sft training
 bash y-trainer/scripts/sft.sh
 ```
+
+### 参数解释
+
+以SFT为例，其他类似
+```
+python -m training_code.start_training \
+    --model_path_to_load model_or_path \ # 需要训练的模型目录
+    --lora_path ./lora \ # 输出的lora文件目录
+    --training_type 'sft' \ # 训练方式
+    --epoch 3 \ # 训练轮数
+    --checkpoint_epoch '0,1,2' \ # 保存检查点轮数
+    --use_NLIRG \
+    --data_path example_dataset/sft_example.json \ # 加载数据集的位置，修改此参数，可以指定你的数据集文件
+    --output_dir outputdir \ # 输出的模型文件目录
+    --use_lora \
+    --batch_size 1 \ # 不建议修改，默认1
+    --token_batch 10 \ # 不建议修改，默认10
+    --lora_target_modules "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj" # 指定训练的网络层
+```
 ## 多GPU
 ```bash
 # Continue pretraining
