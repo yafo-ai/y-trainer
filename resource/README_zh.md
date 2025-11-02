@@ -92,7 +92,7 @@ python -m training_code.start_training \
 bash scripts/pretrain_ds.sh
 
 # sft training
-bash y-trainer/scripts/sft_ds.sh
+bash scripts/sft_ds.sh
 ```
 
 ## 训练数据格式简介
