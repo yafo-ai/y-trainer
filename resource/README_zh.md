@@ -65,7 +65,7 @@ pip install -r requirements.txt
 bash scripts/pretrain_ds.sh
 
 # sft training
-bash y-trainer/scripts/sft.sh
+bash scripts/sft.sh
 ```
 
 ### 参数解释
