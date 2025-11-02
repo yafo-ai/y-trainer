@@ -4,7 +4,7 @@ python -m training_code.start_training \
     --model_path_to_load model_or_path \
     --lora_path ./lora \
     --training_type 'sft' \
-    --epoch 1 \
+    --epoch 3 \
     --checkpoint_epoch '0,1,2' \
     --use_NLIRG \
     --data_path example_dataset/sft_example.json \
