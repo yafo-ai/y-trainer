@@ -4,7 +4,6 @@ import sys
 from training_code.core.config.globle_config import ModelConfig, TrainingConfig
 import torch
 from peft import LoraConfig, PeftConfig, PeftModel, get_peft_model
-import deepspeed
 import torch.distributed as dist
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader 
