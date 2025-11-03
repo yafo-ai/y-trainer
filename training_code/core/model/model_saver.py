@@ -61,7 +61,7 @@ def save_checkpoint_model(model, tokenizer, model_config, training_config, epoch
         return model
     
     if epoch in [e for e in Checkpoint_epoch]:
-        if training_config.use_deepspeed:
+        if model_config.use_deepspeed:
             if training_config.local_rank == 0:
                 logger.warning('Deepespeed checkpoint saving is not supported yet.')
             return model

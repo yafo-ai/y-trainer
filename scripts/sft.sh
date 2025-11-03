@@ -1,7 +1,7 @@
-cd .
+# cd .
 
 python -m training_code.start_training \
-    --model_path_to_load Qwen/Qwen3-4B \
+    --model_path_to_load /root/autodl-fs/model/test_model_qwen1.5b \
     --training_type 'sft' \
     --epoch 3 \
     --checkpoint_epoch '0,1,2' \
