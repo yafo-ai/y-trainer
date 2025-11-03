@@ -6,6 +6,6 @@ def training_processer(model, optimizer, batcher, tokenizer, training_config, mo
     if training_config.training_type == TrainingType.CPT:
         return cpt_train_model(model, optimizer, batcher, training_config, process_logger)
     elif training_config.training_type == TrainingType.SFT:
-        return sft_train_model(model, optimizer, batcher, training_config, model_config, process_logger)
+        return sft_train_model(model, tokenizer, optimizer, batcher, training_config, model_config, process_logger)
     else:
         raise ValueError(f"Not supported training type: {training_config.training_type}")

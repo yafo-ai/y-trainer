@@ -156,7 +156,7 @@ def per_epoch_train(model, optimizer, batcher, training_config, epoch, teacher_m
 
 
 
-def sft_train_model(model, optimizer, batcher, training_config, model_config, tensorboard_writer=None):
+def sft_train_model(model, tokenizer, optimizer, batcher, training_config, model_config, tensorboard_writer=None):
     model.train()
     
     if training_config.Distillition:
@@ -171,7 +171,7 @@ def sft_train_model(model, optimizer, batcher, training_config, model_config, te
     for epoch in range(0, training_config.epoch):
         
         model = per_epoch_train(model, optimizer, batcher, training_config, epoch, teacher_model, tensorboard_writer)
-        save_checkpoint_model(model, training_config, model_config, epoch)
+        save_checkpoint_model(model, tokenizer, training_config, model_config, epoch)
 
     return model
         
