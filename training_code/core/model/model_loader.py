@@ -25,6 +25,7 @@ def initialize_distributed(model_config, training_config):
     
     if model_config.use_deepspeed:
         global WORLD_SIZE, LOCAL_RANK
+        import deepspeed
         deepspeed.init_distributed()
         LOCAL_RANK = int(os.environ.get('LOCAL_RANK',-1))
         WORLD_SIZE = dist.get_world_size()
@@ -44,7 +45,7 @@ def create_ds_config(batcher, training_config):
     warmup_steps = int(total_training_steps * 0.01)  # 10% for warmup
     
     
-    # 创建配置字典
+    # create config dict
     ds_config = {
         "gather_16bit_weights_on_model_save": True,
         "train_micro_batch_size_per_gpu": training_config.batch_size,

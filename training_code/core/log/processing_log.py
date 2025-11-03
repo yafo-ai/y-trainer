@@ -39,7 +39,6 @@ class ProcessLogger:
                     
 
 def export_tensorboard_logs_to_images(log_dir, output_dir) -> None:
-    """将TensorBoard日志导出为PNG图片"""
     try:
         matplotlib.use('Agg')  
         event_acc = EventAccumulator(log_dir)
@@ -48,28 +47,23 @@ def export_tensorboard_logs_to_images(log_dir, output_dir) -> None:
 
         os.makedirs(output_dir, exist_ok=True)
 
-        # 遍历所有标量数据
         for tag in event_acc.Tags()["scalars"]:
-            # 获取数据序列
             events = event_acc.Scalars(tag)
             steps = [e.step for e in events]
             values = [e.value for e in events]
 
-            # 创建画布
             plt.figure(figsize=(10, 6))
             
-            # 绘制曲线
             plt.plot(steps, values, marker='o', markersize=2, linestyle='-')
             plt.title(tag)
             plt.xlabel("Steps")
             plt.ylabel("Loss")
             plt.grid(True)
             
-            # 处理特殊字符
             safe_tag = tag.replace("/", "_")
             plt.savefig(os.path.join(output_dir, f"{safe_tag}.png"), bbox_inches="tight")
             plt.close()
             
         print(f"save tensorboard logs to {output_dir}")
     except Exception as e:
-        print(f"保存训练曲线失败: {str(e)}")
+        print(f"Fail to save logs pic: {str(e)}")
