@@ -1,5 +1,4 @@
 import os
-from deepspeed import zero
 from contextlib import nullcontext
 import torch.distributed as dist
 import logging
