@@ -74,7 +74,7 @@ bash scripts/sft.sh
 ```
 python -m training_code.start_training \
     --model_path_to_load model_or_path \ # 需要训练的模型目录
-    --lora_path ./lora \ # 输出的lora文件目录
+    --lora_path ./lora \ # 加载lora的文件目录（基于lora检查点继续训练是采用此方式）
     --training_type 'sft' \ # 训练方式
     --epoch 3 \ # 训练轮数
     --checkpoint_epoch '0,1,2' \ # 保存检查点轮数
