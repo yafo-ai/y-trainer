@@ -9,7 +9,6 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
 def save_model(model, tokenizer, model_config, training_config):
 
     if training_config.local_rank == 0:
@@ -20,6 +19,8 @@ def save_model(model, tokenizer, model_config, training_config):
 
     try:
         if getattr(model_config,'use_deepspeed', False):
+            # 条件导入deepspeed
+            from deepspeed import zero
             gather_context = (
                 zero.GatheredParameters(list(model.module.parameters()), modifier_rank=0)
                 if model.zero_optimization_stage() == 3
@@ -51,6 +52,7 @@ def save_model(model, tokenizer, model_config, training_config):
     if training_config.local_rank == 0:
         print(f"✅ Finished training.")
 
+
 def save_checkpoint_model(model, tokenizer, model_config, training_config, epoch):
 
     Checkpoint_epoch = training_config.checkpoint_epoch if isinstance(training_config.checkpoint_epoch, list) else [training_config.checkpoint_epoch]
@@ -59,7 +61,7 @@ def save_checkpoint_model(model, tokenizer, model_config, training_config, epoch
         return model
     
     if epoch in [e for e in Checkpoint_epoch]:
-        if training_config.use_deepspeed:
+        if model_config.use_deepspeed:
             if training_config.local_rank == 0:
                 logger.warning('Deepespeed checkpoint saving is not supported yet.')
             return model

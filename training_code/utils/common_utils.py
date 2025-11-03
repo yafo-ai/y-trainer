@@ -12,10 +12,10 @@ def set_seed(seed: int = 42):
 
 def masked_mean(losses: torch.Tensor) -> torch.Tensor:
     """
-    计算非零 loss 的平均值，loss=0 的样本不参与统计。
+    calculate average non-zero loss，token loss=0 is not included.
     
-    :param losses: 一个 batch 的 loss 值，torch.Tensor，例如 [batch_size]
-    :return: 非零 loss 的平均值。如果没有非零 loss，返回 0.
+    :param losses: 
+    :return:
     """
     mask = (losses != 0)
     
@@ -32,14 +32,14 @@ def masked_mean(losses: torch.Tensor) -> torch.Tensor:
 
 def _calculate_sigmoid_weights(exponent, max_lr, min_lr=0):
     """
-    calculate sigmoid lr
+    calculate lr
     
-    :param exponent: 指数值
-    :param max_lr: 最大学习率
-    :param min_lr: 最小学习率（默认为0）
-    :return: 计算得到的学习率
+    :param exponent: 
+    :param max_lr: 
+    :param min_lr: 
+    :return: 
     """
-    # 使用88作为32位浮点数的安全边界
+    # safity edge
     if exponent > 88:
         return max_lr + min_lr
     elif exponent < -88:
@@ -49,16 +49,15 @@ def _calculate_sigmoid_weights(exponent, max_lr, min_lr=0):
 
 def dynamic_sigmoid(loss, max_lr=1, x0=1.2, k=1.7, min_lr=5e-8, loss_threshold=3.0, loss_deadline=15.0) -> float:
     """
-    动态参数化Sigmoid函数（复合策略版本）
-    :param loss: 当前损失值
-    :param max_lr: 最大学习率，曲线的最高点
-    :param x0: 中点，学习率在中点会减半
-    :param min_lr: 最小学习率，曲线的最低点
-    :param k: 曲线的斜率，值越大，最高点和最低点之间的距离越短
-    :param loss_threshold: 易学区间和难学区间使用不同的sigmoid学习率，这两段区间的分界点
-    :param loss_deadline: 学习率降为零的损失截止点，超过该值之后，学习率设为0
+    
+    :param loss: current loss
+    :param max_lr: 
+    :param x0: 
+    :param min_lr: 
+    :param k: 
+    :param loss_threshold: 
+    :param loss_deadline: 
 
-    如何确定sigmoid曲线，请使用以下网址：https://www.desmos.com/calculator/bgontvxotm?lang=zh-CN
     """
     if loss <= loss_threshold:
         # （0.0 <= loss < loss_threshold）
@@ -123,7 +122,7 @@ def dynamic_sigmoid_batch(losses: torch.Tensor,
     mask2 = (losses > loss_threshold) & (losses < loss_deadline)
     if mask2.any():
         loss_masked = losses[mask2]
-        exponent = 1*loss_masked - 6.2  # 原公式
+        exponent = 1*loss_masked - 6.2 
         safe_exponent = torch.clamp(exponent, min=-709, max=709)
         exp_term = torch.exp(safe_exponent)
         sigmoid_part = max_lr / (1 + exp_term) + torch.finfo(torch.float32).eps

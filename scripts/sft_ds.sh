@@ -1,7 +1,7 @@
 cd .
 
 deepspeed --master_port 29501 --include localhost:0,1 --module training_code.start_training \
-    --model_path_to_load model_or_path \
+    --model_path_to_load Qwen/Qwen3-4B \
     --training_type 'sft' \
     --use_deepspeed \
     --use_NLIRG \
