@@ -51,7 +51,7 @@ Train the model in single GPU or multi - GPUs by following example scripts.
 ## Single GPU
 ```bash
 # Continue pretraining
-bash scripts/pretrain_ds.sh
+bash y-trainer/scripts/pretrain_ds.sh
 
 # sft training
 bash y-trainer/scripts/sft.sh
@@ -59,7 +59,7 @@ bash y-trainer/scripts/sft.sh
 ## Multi - GPUs
 ```bash
 # Continue pretraining
-bash scripts/pretrain_ds.sh
+bash y-trainer/scripts/pretrain_ds.sh
 
 # sft training
 bash y-trainer/scripts/sft_ds.sh
