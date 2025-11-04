@@ -160,11 +160,11 @@ def cosine_similarity_manual(a, b):
     return dot_product / (norm_a * norm_b)
 
 
-def similarity_rank(model, tokenizer, data):
+def similarity_rank(model, tokenizer, datas):
 
     similarity_rank = []
 
-    for d in tqdm(data):
+    for d in tqdm(datas):
 
         instruction = d['instruction']
 
@@ -178,9 +178,6 @@ def similarity_rank(model, tokenizer, data):
         mean_loss = np.mean(loss)
         std_entropy = np.std(entropy)
         std_loss = np.std(loss)
-        # loss = np.exp(-1 * loss)
-
-        # 对entropy和loss分别归一化
 
         entropy = (entropy - mean_entropy) / std_entropy
         loss = (loss - mean_loss) / std_loss
@@ -189,8 +186,10 @@ def similarity_rank(model, tokenizer, data):
         cosine_sim = cosine_similarity_manual(entropy, loss)
 
         similarity_rank.append(cosine_sim)
-        
-    return similarity_rank
+
+    sorted_indexes = np.argsort(similarity_rank)
+
+    return sorted_indexes
 
 def filtered_rank(model, tokenizer, datas):
 
@@ -230,7 +229,8 @@ def arg_parse():
     parser.add_argument("--data_path", type=str, default="", help="data path")
     parser.add_argument("--model_path", type=str, default="", help="model path")
     parser.add_argument("--output_path", type=str, default="", help="output path")
-    parser.add_argument("--mode", type=str, default="filtered_rank", help="mode")
+    parser.add_argument("--mode", type=str, default="filtered_rank", help="mode", choices=['similarity_rank','filtered_rank'])
+    parser.add_argument("--desc", action="store_true", help="Whether to sort desc")
     args = parser.parse_args()
     return args
 
@@ -252,12 +252,14 @@ def main():
 
     sorted_indices = rank_func(model, tokenizer, datas)
 
+    step = 1 if arg_parser.desc else -1
+
     sorted_data = []
-    for idx in sorted_indices:
+    for idx in sorted_indices[::step]:
         sorted_data.append(datas[idx])
 
-    with open(datas.output_path, 'w') as f:
-        json.dump(sorted_data, f)
+    with open(arg_parser.output_path, 'w') as f:
+        json.dump(sorted_data, f, ensure_ascii=False, indent=4)
 
 
 
