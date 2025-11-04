@@ -155,6 +155,7 @@ def model_processer(batcher, tokenizer, model_cfg: ModelConfig, training_cfg: Tr
         raise ValueError(f"Unsupported training type: {training_cfg.training_type}.")
 
     if model_cfg.use_deepspeed:
+        import deepspeed
         if model_cfg.deepspeed_cfg_path != "":
             import json
             with open(model_cfg.deepspeed_cfg_path, "r") as f:
