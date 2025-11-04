@@ -162,8 +162,7 @@ def cosine_similarity_manual(a, b):
 
 def similarity_rank(model, tokenizer, datas):
 
-    similarity_rank = []
-
+    similarity_scores = []
     for d in tqdm(datas):
 
         instruction = d['instruction']
@@ -183,13 +182,13 @@ def similarity_rank(model, tokenizer, datas):
         loss = (loss - mean_loss) / std_loss
 
 
-        cosine_sim = cosine_similarity_manual(entropy, loss)
+        cosine_sim = -cosine_similarity_manual(entropy, loss)
 
-        similarity_rank.append(cosine_sim)
+        similarity_scores.append(float(cosine_sim))
 
-    sorted_indexes = np.argsort(similarity_rank)
+    sorted_indexes = np.argsort(similarity_scores)
 
-    return sorted_indexes
+    return sorted_indexes, similarity_scores
 
 def filtered_rank(model, tokenizer, datas):
 
@@ -220,7 +219,7 @@ def filtered_rank(model, tokenizer, datas):
     
     sorted_indexes = np.argsort(trigger_element_count)
            
-    return sorted_indexes
+    return sorted_indexes, trigger_element_count
 
 def arg_parse():
     import argparse
@@ -250,12 +249,13 @@ def main():
 
     rank_func = similarity_rank if arg_parser.mode == "similarity_rank" else filtered_rank
 
-    sorted_indices = rank_func(model, tokenizer, datas)
+    sorted_indices, scores = rank_func(model, tokenizer, datas)
 
     step = 1 if arg_parser.desc else -1
 
     sorted_data = []
-    for idx in sorted_indices[::step]:
+    for idx, score in zip(sorted_indices[::step], scores):
+        datas[idx]['score'] = score
         sorted_data.append(datas[idx])
 
     with open(arg_parser.output_path, 'w') as f:
