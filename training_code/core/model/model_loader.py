@@ -109,8 +109,8 @@ def configure_lora(model, model_config):
         for name, m in model.named_modules():
             if 'lora' in name:
                 m.requires_grad_(True)
-            if hasattr(m, "gradient_checkpointing") and not m.gradient_checkpointing:
-                m.gradient_checkpointing = True
+        #     if hasattr(m, "gradient_checkpointing") and not m.gradient_checkpointing:
+        #         m.gradient_checkpointing = True
 
     model.print_trainable_parameters()
 
