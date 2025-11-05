@@ -88,7 +88,7 @@ def per_epoch_train(model, optimizer, batcher, training_config, epoch, teacher_m
                         backward_loss = loss_unweighted
 
                     if training_config.use_NLIRG:
-                        mask = (log_loss > loss_threshold) & (log_loss < loss_deadline)
+                        # mask = (log_loss > loss_threshold) & (log_loss < loss_deadline)
                         with torch.no_grad():
 
                             weights = dynamic_sigmoid_batch(
@@ -107,7 +107,7 @@ def per_epoch_train(model, optimizer, batcher, training_config, epoch, teacher_m
                     
                     else:
                         
-                        mask = log_loss != 0
+                        # mask = log_loss != 0
                         loss_weighted_unmeand = backward_loss
 
                         masked_loss_weighted = loss_weighted_unmeand.mean()
@@ -117,10 +117,10 @@ def per_epoch_train(model, optimizer, batcher, training_config, epoch, teacher_m
 
                     loss_logs.append(loss_log)
 
-                    loss_weighted_unmeand = loss_weighted_unmeand[mask]
+                    # loss_weighted_unmeand = loss_weighted_unmeand[mask]
 
 
-                    if loss_weighted_unmeand.shape[-1] != 0:
+                    if masked_loss_weighted != 0:
                         if optimizer != None:
 
                             masked_loss_weighted.backward()
@@ -131,7 +131,7 @@ def per_epoch_train(model, optimizer, batcher, training_config, epoch, teacher_m
                             model.backward(masked_loss_weighted)
                             model.step()
                 process_logger.write_tb_log(epoch, step, sum(loss_logs)/len(loss_logs))
-                del loss_log, logits_flatten, loss_unweighted, targets, outputs, backward_loss, mask
+                del loss_log, logits_flatten, loss_unweighted, targets, outputs, backward_loss
                 if 'teacher_output' in locals():
                     del teacher_output
                 if 'teacher_logits' in locals():
