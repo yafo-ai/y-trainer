@@ -252,6 +252,7 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
                 lora_config = LoraConfig({
                     'lora_path': parser.lora_path,
                 })
+                logger.info(f"LoRA in {parser.lora_path} is loading")
             else:
                 lora_config = LoraConfig({
                     "lora_path": parser.lora_path,
@@ -260,8 +261,7 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
                     "lora_target_modules": target_modules,
                     "lora_dropout": parser.lora_dropout,
                 })
-            
-            logger.info(f"LoRA target modules: {target_modules}")
+                logger.info(f"LoRA target modules: {target_modules}")
 
         model_config = ModelConfig({
             "model_path_to_load": parser.model_path_to_load,
