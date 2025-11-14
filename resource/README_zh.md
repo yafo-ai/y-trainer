@@ -15,7 +15,7 @@ Y-Trainer 是一个LLM模型微调训练框架。
 
 - 🏆 **单卡强化学习**：无需依赖参考模型、教师模型，仅需基础模型+奖励函数，即可稳定的进行强化学习训练。
 
-  
+官网介绍： [Y-Trainer](https://y-agent/docs/y-trainer/introduction)
 
 该框架包含以下三个核心组件：继续预训练（CPT）指令微调（SFT）强化学习（RL）[将**很快发布**需要配合Y-agent使用]。
 
@@ -47,7 +47,7 @@ Y-Trainer 是一个LLM模型微调训练框架。
 # Installation
 
 ```bash
-cd Y-TRAINER
+cd y-trainer
 
 pip install -r requirements.txt
 ```
@@ -74,15 +74,17 @@ python -m training_code.start_training \
     --lora_path ./lora \ # 加载lora的文件目录（基于lora检查点继续训练是采用此方式）
     --training_type 'sft' \ # 训练方式
     --epoch 3 \ # 训练轮数
-    --checkpoint_epoch '0,1,2' \ # 保存检查点轮数
-    --use_NLIRG \
+    --checkpoint_epoch '0,1' \ # 保存检查点轮数
+    --use_NLIRG \  #核心算法，默认启用
     --data_path example_dataset/sft_example.json \ # 加载数据集的位置，修改此参数，可以指定你的数据集文件
     --output_dir outputdir \ # 输出的模型文件目录
-    --use_lora \
+    --use_lora \  #使用lora方式进行训练
     --batch_size 1 \ # 不建议修改，默认1
     --token_batch 10 \ # 不建议修改，默认10
     --lora_target_modules "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj" # 指定训练的网络层
 ```
+
+[更多参数说明](https://y-agent/docs/y-trainer/config).
 ## 多GPU
 ```bash
 # Continue pretraining
