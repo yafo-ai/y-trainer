@@ -128,7 +128,7 @@ def parse_args() -> Namespace:
     parser.add_argument("--system_prompt", type=str, default="You are a helpful assistant.", help="System prompt")
 
     # LoRA config
-    parser.add_argument("--use_lora", action="store_true", help="Whether to use LoRA")
+    parser.add_argument("--use_lora", type=str, default="false", help="Whether to use LoRA")
     parser.add_argument("--lora_path", type=str, default="", help="Path to trained LoRA model")
     parser.add_argument("--lora_rank", type=int, default=16, help="Rank of the LoRA model")
     parser.add_argument("--lora_alpha", type=float, default=32, help="Alpha parameter for LoRA")
@@ -148,18 +148,18 @@ def parse_args() -> Namespace:
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1, 
                         help="Gradient accumulation steps for training")
 
-    parser.add_argument('--save_optimizer_state', action="store_true", help='whether to save optimizer state')
-    parser.add_argument('--use_deepspeed', action="store_true", help='whether to use deepspeed config')
+    parser.add_argument('--save_optimizer_state', type=str, default="false", help='whether to save optimizer state')
+    parser.add_argument('--use_deepspeed', type=str, default="false", help='whether to use deepspeed config')
     parser.add_argument('--deepspeed_cfg_path', type=str, default="", help='deepspeed config path, if not set, will automaticaly generate one with stage 3')
     parser.add_argument('--local_rank', type=int, default=0, help="Rank for current process")
-    parser.add_argument('--enable_gradit_checkpoing', action="store_true", help='whether to set gradit checkpoing')
+    parser.add_argument('--enable_gradit_checkpoing', type=str, default="false", help='whether to set gradit checkpoing')
 
     # cpt config
     parser.add_argument("--pack_length", type=int, default=-1, 
                         help="Pack length for training, -1 means no pack")
 
     # sft config
-    parser.add_argument("--not_use_NLIRG", action="store_true", help="Whether to use NLIRG")
+    parser.add_argument("--use_NLIRG", type=str, default="false", help="Whether to use NLIRG")
     parser.add_argument("--max_seq_len", type=int, default=20520, help="Max sequence length for training")
     parser.add_argument("--token_batch", type=int, default=-1, 
                         help="Token batch for training, 0 means no token batch")
@@ -174,11 +174,11 @@ def parse_args() -> Namespace:
     parser.add_argument("--output_dir", type=str, required=True, help="Path to the output directory")
 
     # logging config
-    parser.add_argument("--use_tensorboard", action="store_true", help="Whether to use tensorboard")
+    parser.add_argument("--use_tensorboard", type=str, default="false", help="Whether to use tensorboard")
     parser.add_argument("--tensorboard_path", type=str, default="", 
                         help="User can specify the path to tensorboard, default is the output_dir")
     
-    parser.add_argument("--use_process_bar", action="store_true", help="Whether to use process bar")
+    parser.add_argument("--use_process_bar", type=str, default="false", help="Whether to use process bar")
     args = parser.parse_args()
     
     _validate_args(args)
@@ -209,7 +209,7 @@ def _validate_args(args: Namespace) -> None:
     if args.gradient_accumulation_steps <= 0:
         raise ValueError(f"Gradient accumulation steps must be positive, got {args.gradient_accumulation_steps}")
     
-    if args.use_lora:
+    if args.use_lora == 'true':
         if args.lora_rank <= 0:
             raise ValueError(f"LoRA rank must be positive, got {args.lora_rank}")
         
@@ -242,7 +242,7 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
         
         # 构建 LoRA 配置
         lora_config: Optional[LoraConfig] = None
-        if parser.use_lora:
+        if parser.use_lora == 'true':
             # 安全处理 lora_target_modules
             target_modules = []
             if parser.lora_target_modules:
@@ -265,13 +265,13 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
 
         model_config = ModelConfig({
             "model_path_to_load": parser.model_path_to_load,
-            "use_lora": parser.use_lora,
+            "use_lora": parser.use_lora == 'true',
             "lora_config": lora_config,
             "data_type": _parse_data_type(parser.data_type), 
             "system_prompt": parser.system_prompt,
-            "use_deepspeed": parser.use_deepspeed,
+            "use_deepspeed": parser.use_deepspeed=='true',
             "deepspeed_cfg_path": parser.deepspeed_cfg_path,
-            "gradit_checkpoing": getattr(parser, "enable_gradit_checkpoing", False)
+            "gradit_checkpoing": getattr(parser, "enable_gradit_checkpoing", 'false') == 'true'
 
         })
         
@@ -283,9 +283,9 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
             "data_path": parser.data_path,
             "output_dir": parser.output_dir,
             "seed": parser.seed,
-            "use_tensorboard": parser.use_tensorboard,
+            "use_tensorboard": parser.use_tensorboard=='true',
             "tensorboard_path": parser.tensorboard_path if parser.tensorboard_path != '' else parser.output_dir,
-            "use_process_bar": parser.use_process_bar,
+            "use_process_bar": parser.use_process_bar=='true',
             "training_type": parser.training_type,
             "checkpoint_epoch": [int(ep) for ep in parser.checkpoint_epoch.split(',') if ep != ''],
             "local_rank": parser.local_rank,
@@ -298,7 +298,7 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
 
         if training_type == TrainingType.SFT.value:
             training_config.update({
-                "use_NLIRG": not getattr(parser, "not_use_NLIRG", False), 
+                "use_NLIRG": getattr(parser, "use_NLIRG", 'false')=='true', 
                 "token_batch": getattr(parser, "token_batch", -1),
                 "Distillition": getattr(parser, "Distillition", False),
                 "teacher_model_path": getattr(parser, "teacher_model_path", ""),
@@ -306,16 +306,16 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
                 "max_seq_len": getattr(parser, "max_seq_len", 20520),
                 
             })
-            logger.info(f"SFT training mode selected with NLIRG={not getattr(parser, "not_use_NLIRG", False)}")
+            logger.info(f"SFT training mode selected with NLIRG={getattr(parser, "use_NLIRG", 'false')=='true'}")
         elif training_type == TrainingType.CPT.value:
             training_config.update({
                 "pack_length": getattr(parser, "pack_length", -1),
-                "use_NLIRG": not getattr(parser, "not_use_NLIRG", False),
+                "use_NLIRG": getattr(parser, "use_NLIRG", 'false')=='true',
             })
             logger.info(f"CPT training mode selected with pack_length={getattr(parser, 'pack_length', -1)}")
         elif training_type == TrainingType.RL.value:
             training_config.update({
-                "use_NLIRG": not getattr(parser, "not_use_NLIRG", False),
+                "use_NLIRG": getattr(parser, "use_NLIRG", 'false')=='true',
                 "token_batch": getattr(parser, "token_batch", -1),
                 "Distillition": getattr(parser, "Distillition", False),
                 "teacher_model_path": getattr(parser, "teacher_model_path", ""),
