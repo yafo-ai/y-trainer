@@ -7,7 +7,6 @@ deepspeed --master_port 29501 --include localhost:0,1 --module training_code.sta
     --batch_size 2 \
     --use_deepspeed \
     --pack_length 1024 \
-    --use_NLIRG \
     --data_path example_dataset/cpt_example.json \
     --output_dir outputdir \
     --use_lora \

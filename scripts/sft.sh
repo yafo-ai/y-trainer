@@ -5,7 +5,6 @@ python -m training_code.start_training \
     --training_type 'sft' \
     --epoch 3 \
     --checkpoint_epoch '0,1,2' \
-    --use_NLIRG \
     --data_path example_dataset/sft_example.json \
     --output_dir outputdir \
     --use_lora \
