@@ -7,8 +7,8 @@ python -m training_code.start_training ^
     --model_path_to_load "Qwen/Qwen3-4B" ^
     --training_type "sft" ^
     --epoch 3 ^
+    --use_NLIRG "true" ^
     --checkpoint_epoch "0,1,2" ^
-    --use_NLIRG ^
     --data_path ".\example_dataset\sft_example.json" ^
     --output_dir ".\LLM_models\TEST_SFT" ^
     --use_lora ^
