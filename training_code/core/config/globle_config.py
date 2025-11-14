@@ -159,7 +159,7 @@ def parse_args() -> Namespace:
                         help="Pack length for training, -1 means no pack")
 
     # sft config
-    parser.add_argument("--use_NLIRG", action="store_true", help="Whether to use NLIRG")
+    parser.add_argument("--not_use_NLIRG", action="store_true", help="Whether to use NLIRG")
     parser.add_argument("--max_seq_len", type=int, default=20520, help="Max sequence length for training")
     parser.add_argument("--token_batch", type=int, default=-1, 
                         help="Token batch for training, 0 means no token batch")
@@ -298,7 +298,7 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
 
         if training_type == TrainingType.SFT.value:
             training_config.update({
-                "use_NLIRG": getattr(parser, "use_NLIRG", False), 
+                "use_NLIRG": not getattr(parser, "not_use_NLIRG", False), 
                 "token_batch": getattr(parser, "token_batch", -1),
                 "Distillition": getattr(parser, "Distillition", False),
                 "teacher_model_path": getattr(parser, "teacher_model_path", ""),
@@ -306,16 +306,16 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
                 "max_seq_len": getattr(parser, "max_seq_len", 20520),
                 
             })
-            logger.info(f"SFT training mode selected with NLIRG={getattr(parser, 'use_NLIRG', False)}")
+            logger.info(f"SFT training mode selected with NLIRG={not getattr(parser, "not_use_NLIRG", False)}")
         elif training_type == TrainingType.CPT.value:
             training_config.update({
                 "pack_length": getattr(parser, "pack_length", -1),
-                "use_NLIRG": getattr(parser, "use_NLIRG", False),
+                "use_NLIRG": not getattr(parser, "not_use_NLIRG", False),
             })
             logger.info(f"CPT training mode selected with pack_length={getattr(parser, 'pack_length', -1)}")
         elif training_type == TrainingType.RL.value:
             training_config.update({
-                "use_NLIRG": getattr(parser, "use_NLIRG", False),
+                "use_NLIRG": not getattr(parser, "not_use_NLIRG", False),
                 "token_batch": getattr(parser, "token_batch", -1),
                 "Distillition": getattr(parser, "Distillition", False),
                 "teacher_model_path": getattr(parser, "teacher_model_path", ""),
