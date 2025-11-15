@@ -63,6 +63,8 @@ bash scripts/pretrain_ds.sh
 
 # sft training
 bash scripts/sft.sh
+# windows sft training
+./scripts/sft.bat
 ```
 
 ### 参数解释
@@ -75,10 +77,10 @@ python -m training_code.start_training \
     --training_type 'sft' \ # 训练方式
     --epoch 3 \ # 训练轮数
     --checkpoint_epoch '0,1' \ # 保存检查点轮数
-    --use_NLIRG \  #核心算法，默认启用
+    --use_NLIRG 'true'\  #核心算法，默认启用
     --data_path example_dataset/sft_example.json \ # 加载数据集的位置，修改此参数，可以指定你的数据集文件
     --output_dir outputdir \ # 输出的模型文件目录
-    --use_lora \  #使用lora方式进行训练
+    --use_lora 'true' \  #使用lora方式进行训练
     --batch_size 1 \ # 不建议修改，默认1
     --token_batch 10 \ # 不建议修改，默认10
     --lora_target_modules "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj" # 指定训练的网络层
