@@ -9,7 +9,6 @@ deepspeed --master_port 29501 --include localhost:0,1 --module training_code.sta
     --pack_length 1024 \
     --data_path example_dataset/cpt_example.json \
     --output_dir outputdir \
-    --use_lora \
     --epoch 3 \
     --use_NLIRG 'true' \
     --lora_target_modules "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj"

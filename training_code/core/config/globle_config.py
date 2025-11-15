@@ -306,7 +306,7 @@ def config_register(addition_config: Optional[Dict[str, Any]] = None) -> Tuple[M
                 "max_seq_len": getattr(parser, "max_seq_len", 20520),
                 
             })
-            logger.info(f"SFT training mode selected with NLIRG={getattr(parser, "use_NLIRG", 'false')=='true'}")
+            logger.info(f"SFT training mode selected with NLIRG={getattr(parser, 'use_NLIRG', 'false')=='true'}")
         elif training_type == TrainingType.CPT.value:
             training_config.update({
                 "pack_length": getattr(parser, "pack_length", -1),

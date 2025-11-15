@@ -9,5 +9,4 @@ deepspeed --master_port 29501 --include localhost:0,1 --module training_code.sta
     --output_dir outputdir \
     --batch_size 1 \
     --token_batch 10 \
-    --use_lora \
     --lora_target_modules "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj"

@@ -4,10 +4,9 @@ python -m training_code.start_training \
     --model_path_to_load /root/autodl-fs/model/test_model_qwen1.5b \
     --training_type 'sft' \
     --epoch 3 \
-    --checkpoint_epoch '0,1,2' \
+    --checkpoint_epoch '0,1' \
     --data_path example_dataset/sft_example.json \
     --output_dir outputdir \
-    --use_lora \
     --batch_size 1 \
     --token_batch 10 \
     --use_NLIRG 'true' \
