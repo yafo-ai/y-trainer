@@ -46,6 +46,7 @@ Y-Trainer 是一个LLM模型微调训练框架。
 
 # Installation
 
+
 ```bash
 cd y-trainer
 
@@ -54,7 +55,19 @@ pip install -r requirements.txt
 
 # Quick Start
 
-您可以通过以下示例脚本轻松训练自己的模型。
+通过命令启动训练服务（启动前可以通过configs/sever_config.py修改端口和指定大模型文件夹）
+
+```bash
+python main.py
+```
+
+浏览器打开：http://localhost:8010
+
+即可便捷使用训练、集成注意力分析、内容压缩、样本生成和聚类筛选功能的专业AI文本处理工具。
+
+
+
+您也可以通过以下示例脚本轻松训练自己的模型。
 
 ## 单 GPU
 ```bash
@@ -71,14 +84,14 @@ bash scripts/sft.sh
 
 以SFT为例，其他类似
 ```
-python -m training_code.start_training \
+python -m start_training \
     --model_path_to_load model_or_path \ # 需要训练的模型目录
     --lora_path ./lora \ # 加载lora的文件目录（基于lora检查点继续训练是采用此方式）
     --training_type 'sft' \ # 训练方式
     --epoch 3 \ # 训练轮数
     --checkpoint_epoch '0,1' \ # 保存检查点轮数
     --use_NLIRG 'true'\  #核心算法，默认启用
-    --data_path example_dataset/sft_example.json \ # 加载数据集的位置，修改此参数，可以指定你的数据集文件
+    --data_path ./data/sft_example.json \ # 加载数据集的位置，修改此参数，可以指定你的数据集文件
     --output_dir outputdir \ # 输出的模型文件目录
     --use_lora 'true' \  #使用lora方式进行训练
     --batch_size 1 \ # 不建议修改，默认1
