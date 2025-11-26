@@ -59,7 +59,7 @@ pip install -r requirements.txt
 
 ```bash
 python main.py
-```bash
+```
 
 浏览器打开：http://localhost:8010
 

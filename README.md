@@ -44,6 +44,18 @@ pip install -r requirements.txt
 
 # Quick Start
 
+Start the Training Service
+You can start the training service by running the following command. (Before starting, you can modify the port and specify the large model folder in configs/server_config.py).
+
+```bash
+python main.py
+```
+Then, open your browser and navigate to:
+http://localhost:8010
+
+You can now use this professional AI text processing tool, which provides convenient features for training, integrated attention analysis, content compression, sample generation, and clustering-based filtering.
+
+
 You can easily use these scripts to train your own model. 
 
 Train the model in single GPU or multi - GPUs by following example scripts.
