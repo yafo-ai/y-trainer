@@ -1,0 +1,3 @@
+FASTAPI_HOST = "0.0.0.0"
+FASTAPI_PORT = 8010
+MODEL_DIR="/raid1/big-models/"

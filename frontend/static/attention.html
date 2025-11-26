@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注意力分数</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/attention.css">
+</head>
+
+<body>
+    <!-- Floating background elements -->
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <!-- Header navigation -->
+    <nav class="header-nav">
+        <div class="nav-container">
+            <div class="logo">Y-Trainer</div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">首页</a></li>
+                <li><a href="model.html" class="nav-link">模型微调</a></li>
+                <li><a href="attention.html" class="nav-link active">注意力分析</a></li>
+                <li><a href="compression.html" class="nav-link">内容压缩</a></li>
+                <li><a href="generation.html" class="nav-link">样本生成</a></li>
+                <li><a href="clustering.html" class="nav-link">聚类筛选</a></li>
+                
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="main-layout">
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="module-header">
+                    <h1 class="module-title">
+                        <i class="fas fa-brain"></i>
+                        注意力分数
+                    </h1>
+                    <div class="model-selector-container">
+                        <label for="modelSelect">模型:</label>
+                        <select id="modelSelect" class="model-select">
+                        </select>
+                        <div class="model-dropdown" id="modelDropdown">
+                            <div class="model-current">
+                                <i class="fas fa-robot"></i>
+                                <span class="model-name">选择模型</span>
+                                <i class="fas fa-chevron-down caret"></i>
+                            </div>
+                            <div class="model-menu">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub Module Navigation -->
+                <div class="sub-module-nav">
+                    <div class="sub-module-buttons">
+                        <button class="sub-module-btn active" onclick="switchSubModule('attention-score')">
+                            <i class="fas fa-chart-bar"></i> 注意力分数分析
+                        </button>
+                        <button class="sub-module-btn" onclick="switchSubModule('token-loss')">
+                            <i class="fas fa-chart-line"></i> Token损失分析
+                        </button>
+                        <button class="sub-module-btn" onclick="switchSubModule('token-entropy')">
+                            <i class="fas fa-random"></i> Token熵分析
+                        </button>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="resetAnalysisCompletely()">
+                            <i class="fas fa-redo"></i> 重置
+                        </button>
+                        <button class="btn btn-primary" onclick="generateAnalysis()">
+                            <i class="fas fa-play"></i> 生成分析
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input/Output Container -->
+                <div class="io-container">
+                    <div class="input-section">
+                        <div class="section-header">
+                            <i class="fas fa-question-circle"></i> 输入内容 (问题/提示)
+                            <button class="input-btn" onclick="loadInputSample()">
+                                <i class="fas fa-file-import"></i> 示例
+                            </button>
+                        </div>
+                        <div class="section-content">
+                            <textarea id="inputContent" class="input-textarea"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="input-section">
+                        <div class="section-header">
+                            <i class="fas fa-bullseye"></i> 目标输出 (期望答案)
+                            <button class="input-btn" onclick="loadTargetSample()">
+                                <i class="fas fa-file-import"></i> 示例
+                            </button>
+                        </div>
+                        <div class="section-content">
+                            <textarea id="targetContent" class="input-textarea"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section">
+                    <div class="results-header">
+                        <div class="results-info">
+                            <h3 id="resultsTitle" style="font-size: 1rem; font-weight: 600; color: #374151;">注意力分数对比分析
+                            </h3>
+                        </div>
+                        <div id="resultsDescription" style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">
+                            <i class="fas fa-info-circle"></i>
+                            点击答案中的token查看对应问题内容的注意力分数高亮效果
+                        </div>
+                    </div>
+                    <div class="results-content">
+                        <div id="resultsDisplay" class="output-display">
+                            <!-- 注意力分析重构区域 -->
+                            <div id="attentionAnalysisLayout" class="attention-layout">
+                                <!-- 左侧模型答案与注意力高亮 -->
+                                <div class="attention-column model-column">
+                                    <!-- 模型生成答案 -->
+                                    <div class="output-box">
+                                        <div class="output-title">
+                                            <i class="fas fa-robot"></i>
+                                            <span>模型生成答案</span>
+                                            <button class="copy-btn" onclick="copyModelAnswer()" title="复制完整答案">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                        <div id="modelTokens" class="output-text">
+                                            <div class="empty-state">
+                                                <i class="fas fa-robot"></i>
+                                                <p>模型生成的答案将在这里显示</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 模型答案对应的注意力高亮 -->
+                                    <div id="modelAttentionMirror" class="input-mirror">
+                                        <div class="input-mirror-title">
+                                            原始问题/提示 - 注意力高亮 (模型答案)
+                                        </div>
+                                        <div id="modelInputMirror" class="output-text">
+                                            <div class="empty-state">
+                                                <i class="fas fa-question-circle"></i>
+                                                <p>点击上方模型答案的token查看注意力分数</p>
+                                            </div>
+                                        </div>
+                                        <!-- 模型答案分数显示区域 -->
+                                        <div id="modelScoreDisplay" class="score-display-area" style="display: none;">
+                                            <div class="score-display-header">
+                                                <i class="fas fa-chart-line"></i>
+                                                <span>Token 注意力分数 (模型答案)</span>
+                                            </div>
+                                            <div class="score-display-content">
+                                                <!-- 分数内容将在这里动态生成 -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 右侧目标答案与注意力高亮 -->
+                                <div class="attention-column target-column">
+                                    <!-- 目标期望答案 -->
+                                    <div class="output-box">
+                                        <div class="output-title">
+                                            <i class="fas fa-bullseye"></i>
+                                            <span>目标期望答案</span>
+                                        </div>
+                                        <div id="targetTokens" class="output-text">
+                                            <div class="empty-state">
+                                                <i class="fas fa-bullseye"></i>
+                                                <p>目标期望答案将在这里显示</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 目标答案对应的注意力高亮 -->
+                                    <div id="targetAttentionMirror" class="input-mirror">
+                                        <div class="input-mirror-title">
+                                            原始问题/提示 - 注意力高亮 (目标答案)
+                                        </div>
+                                        <div id="targetInputMirror" class="output-text">
+                                            <div class="empty-state">
+                                                <i class="fas fa-question-circle"></i>
+                                                <p>点击上方目标答案的token查看注意力分数</p>
+                                            </div>
+                                        </div>
+                                        <!-- 目标答案分数显示区域 -->
+                                        <div id="targetScoreDisplay" class="score-display-area" style="display: none;">
+                                            <div class="score-display-header">
+                                                <i class="fas fa-chart-line"></i>
+                                                <span>Token 注意力分数 (目标答案)</span>
+                                            </div>
+                                            <div class="score-display-content">
+                                                <!-- 分数内容将在这里动态生成 -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 动态分析区域 (损失和熵分析) -->
+                            <div id="dynamicAnalysisArea" style="display: none; width: 100%;">
+                                <!-- 损失和熵分析柱状图对比区域 -->
+                                <div id="chartComparisonArea" class="chart-comparison-layout">
+                                    <!-- 模型答案柱状图 -->
+                                    <div class="chart-column">
+                                        <div class="output-box">
+                                            <div class="output-title">
+                                                <i class="fas fa-robot"></i>
+                                                <span id="modelChartTitle">模型生成答案</span>
+                                                <button class="copy-btn" onclick="copyModelAnswer()" title="复制完整答案">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                            </div>
+                                            <div id="modelChart" class="chart-container">
+                                                <div class="empty-state">
+                                                    <i class="fas fa-chart-bar"></i>
+                                                    <p>模型答案柱状图将在这里显示</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 目标答案柱状图 -->
+                                    <div class="chart-column">
+                                        <div class="output-box">
+                                            <div class="output-title">
+                                                <i class="fas fa-bullseye"></i>
+                                                <span id="targetChartTitle">目标期望答案 - 损失分析</span>
+                                            </div>
+                                            <div id="targetChart" class="chart-container">
+                                                <div class="empty-state">
+                                                    <i class="fas fa-chart-bar"></i>
+                                                    <p>目标答案柱状图将在这里显示</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="scripts/config.js"></script>
+    <script src="scripts/attention.js"></script>
+</body>
+
+</html>
