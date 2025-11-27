@@ -13,6 +13,8 @@ python -m start_training ^
     --output_dir ".\LLM_models\TEST_SFT" ^
     --batch_size 1 ^
     --token_batch 10 ^
+    --enable_gradit_checkpoing 'true' \ 
+    --use_lora 'true' \
     --lora_target_modules "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj"
 
 if %errorlevel% equ 0 (

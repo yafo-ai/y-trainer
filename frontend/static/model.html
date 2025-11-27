@@ -1082,7 +1082,20 @@
                 mySelectHtml += '<option value="' + item + '">' + item + '</option>';
             }
             dom.html(mySelectHtml);
-            dom.select2();
+            dom.select2({
+                tags: true, // 启用标签支持
+                createTag: function (params) {
+                    // 检查输入是否为空，如果不是空字符串则创建标签
+                    var term = $.trim(params.term);
+                    if (term === '') {
+                        return null;
+                    }
+                    return {
+                        id: term,
+                        text: term
+                    };
+                }
+            });
         }
 
 

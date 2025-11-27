@@ -58,3 +58,98 @@ const API_CONFIG = {
 
 // 兼容性：为了向后兼容，也可以直接导出配置对象
 window.API_CONFIG = API_CONFIG; 
+
+
+
+function $ajaxGet(url, data, sucfn, errfn) {
+    var queryParams = data;
+    var queryString = new URLSearchParams(queryParams).toString();
+    var ajaxurl = url + (data ? '?' + queryString : '');
+    fetch(ajaxurl)
+        .then(async response => {
+            if (response.body && response.body.getReader) {
+                const reader = response.body.getReader();
+                let result = '';
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        break;
+                    }
+                    result += new TextDecoder().decode(value);
+                }
+                var res = JSON.parse(result);
+                if (res.code == 200) {
+                    return res;
+                } else {
+                    throw new Error(result);
+                }
+
+            } else if (response.status == 200) {
+                return response.json()
+            }
+
+        })
+        .then(data => {
+
+            sucfn && sucfn(data)
+        })
+        .catch(error => {
+            console.log(error, 'error');
+            try {
+                var errdata = JSON.parse(error.toString().replace(/^Error: /, ''));
+                if (errdata.code != 200 && errdata.message) {
+                    alert(errdata.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+
+            errfn && errfn(error)
+        });
+}
+
+function $ajax(url, data, sucfn, errfn) {
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(async response => {
+            if (response.body && response.body.getReader) {
+                const reader = response.body.getReader();
+                let result = '';
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        break;
+                    }
+                    result += new TextDecoder().decode(value);
+                }
+                var res = JSON.parse(result);
+                if (res.code == 200) {
+                    return res;
+                } else {
+                    throw new Error(result);
+                }
+            } else if (response.status == 200) {
+                return response.json()
+            }
+        })
+        .then(data => {
+            sucfn && sucfn(data)
+        })
+        .catch(error => {
+            try {
+                var errdata = JSON.parse(error.toString().replace(/^Error: /, ''));
+                if (errdata.code != 200 && errdata.message) {
+                    alert(errdata.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+            errfn && errfn(error)
+        });
+
+}
