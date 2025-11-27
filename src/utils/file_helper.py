@@ -42,7 +42,7 @@ class FileHelper:
         """
         paths = []
         if not os.path.exists(root_path):
-            return paths
+            raise Exception(f"模型目录不存在: {root_path}")
         for root, dirs, files in os.walk(root_path):
             if os.path.basename(root).startswith('.'):
                 continue

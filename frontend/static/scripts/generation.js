@@ -715,14 +715,11 @@ function changeModel(modelName, menuItem) {
 
   // 构造URL，确保modelName被正确编码
       const url = new URL(API_CONFIG.getUrl('CHANGE_MODEL'))
-  url.searchParams.append("model_name", modelName)
+  // url.searchParams.append("model_name", modelName)
 
   console.log("完整请求URL:", url.toString())
-
-  // 使用新的请求URL
-  proxyFetch(url.toString())
-    .then((data) => {
-      console.log("切换模型返回数据:", data)
+  $ajaxGet(url,{model_name:modelName},function(data){
+    console.log("切换模型返回数据:", data)
       if (data.code === 200) {
         // 更新当前显示
         modelNameDisplay.textContent = getShortModelName(modelName)
@@ -746,12 +743,11 @@ function changeModel(modelName, menuItem) {
         modelNameDisplay.textContent = originalText
         alert("模型切换失败: " + data.message)
       }
-    })
-    .catch((error) => {
-      console.error("模型切换请求失败:", error)
-      modelNameDisplay.textContent = originalText
-      alert("模型切换请求失败，可能是网络问题或API服务不可用")
-    })
+  },function(err){
+    modelNameDisplay.textContent = originalText
+  })
+
+
 }
 
 // 获取模型的短名称（从路径中提取）

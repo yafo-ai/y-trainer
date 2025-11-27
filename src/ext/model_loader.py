@@ -1,4 +1,5 @@
 import gc
+import os
 import threading
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -27,6 +28,11 @@ class ModelLoader:
 
     def load_model(self):
         if self._model is None:
+            if not os.path.exists(self.model_path):
+                raise Exception(f"模型路径不存在: {self.model_path}")
+            if not any(os.listdir(self.model_path)):
+                raise Exception(f"模型路径为空，请先保存模型到->{self.model_path}")
+
             self._model = AutoModelForCausalLM.from_pretrained(
                 self.model_path, 
                 device_map=self.device_map,

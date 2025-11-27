@@ -208,50 +208,77 @@ function changeModel(modelName, menuItem) {
     
     // 构造URL，确保modelName被正确编码
     const url = new URL(baseUrl);
-    url.searchParams.append("model_name", modelName);
+    // url.searchParams.append("model_name", modelName);
 
     console.log("完整请求URL:", url.toString());
+    $ajaxGet(url,{model_name:modelName},function(data){
+      if (data.code === 200) {
+        // 更新当前显示
+        modelNameDisplay.textContent = getShortModelName(modelName)
+
+        // 更新隐藏的select元素值
+        const modelSelect = document.getElementById("modelSelect")
+        modelSelect.value = modelName
+
+        // 更新激活状态
+        const modelMenu = document.querySelector(".model-menu")
+        const modelItems = modelMenu.querySelectorAll(".model-item")
+        modelItems.forEach((mi) => mi.classList.remove("active"))
+        menuItem.classList.add("active")
+
+        // 关闭下拉菜单
+        document.getElementById("modelDropdown").classList.remove("active")
+
+        console.log("模型成功切换为:", modelName)
+      } else {
+        console.error("模型切换失败:", data.message)
+        modelNameDisplay.textContent = originalText
+        alert("模型切换失败: " + data.message)
+      }
+    },function(err){
+      modelNameDisplay.textContent = originalText
+    })
 
     // 使用新的请求URL
-    proxyFetch(url.toString())
-      .then((data) => {
-        console.log("切换模型返回数据:", data)
-        if (data.code === 200) {
-          // 更新当前显示
-          modelNameDisplay.textContent = getShortModelName(modelName)
+    // proxyFetch(url.toString())
+    //   .then((data) => {
+    //     console.log("切换模型返回数据:", data)
+    //     if (data.code === 200) {
+    //       // 更新当前显示
+    //       modelNameDisplay.textContent = getShortModelName(modelName)
 
-          // 更新隐藏的select元素值
-          const modelSelect = document.getElementById("modelSelect")
-          modelSelect.value = modelName
+    //       // 更新隐藏的select元素值
+    //       const modelSelect = document.getElementById("modelSelect")
+    //       modelSelect.value = modelName
 
-          // 更新激活状态
-          const modelMenu = document.querySelector(".model-menu")
-          const modelItems = modelMenu.querySelectorAll(".model-item")
-          modelItems.forEach((mi) => mi.classList.remove("active"))
-          menuItem.classList.add("active")
+    //       // 更新激活状态
+    //       const modelMenu = document.querySelector(".model-menu")
+    //       const modelItems = modelMenu.querySelectorAll(".model-item")
+    //       modelItems.forEach((mi) => mi.classList.remove("active"))
+    //       menuItem.classList.add("active")
 
-          // 关闭下拉菜单
-          document.getElementById("modelDropdown").classList.remove("active")
+    //       // 关闭下拉菜单
+    //       document.getElementById("modelDropdown").classList.remove("active")
 
-          console.log("模型成功切换为:", modelName)
-        } else {
-          console.error("模型切换失败:", data.message)
-          modelNameDisplay.textContent = originalText
-          alert("模型切换失败: " + data.message)
-        }
-      })
-      .catch((error) => {
-        console.error("模型切换请求失败:", error)
-        modelNameDisplay.textContent = originalText
-        alert("模型切换请求失败，可能是网络问题或API服务不可用")
-      })
+    //       console.log("模型成功切换为:", modelName)
+    //     } else {
+    //       console.error("模型切换失败:", data.message)
+    //       modelNameDisplay.textContent = originalText
+    //       alert("模型切换失败: " + data.message)
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.error("模型切换请求失败:", error)
+    //     modelNameDisplay.textContent = originalText
+    //     alert("模型切换请求失败，可能是网络问题或API服务不可用")
+    //   })
   } catch (error) {
     console.error("URL构造失败:", error);
     console.error("基础URL:", API_CONFIG.getUrl('CHANGE_MODEL'));
     
     // 恢复原始文本并显示错误
     modelNameDisplay.textContent = originalText;
-    alert("切换模型失败：URL配置错误。请检查网络连接或联系管理员。");
+    // alert("切换模型失败：URL配置错误。请检查网络连接或联系管理员。");
     return;
   }
 }

@@ -61,9 +61,13 @@ pip install -r requirements.txt
 python main.py
 ```
 
-浏览器打开：http://localhost:8010
+浏览器打开：http://localhost:8010；linux无法直接打开浏览器的云服务器，可以通过ssh连接到云服务器，即可在本地浏览器打开。
 
-即可便捷使用训练、集成注意力分析、内容压缩、样本生成和聚类筛选功能的专业AI文本处理工具。
+例如： ssh -p 39114 -L 0.0.0.0:8010:localhost:8010 root@connect.xxx.sss.com
+
+网页便捷使用训练、集成注意力分析、内容压缩、样本生成和聚类筛选功能的专业AI文本处理工具。
+![训练UI](resource/ui.png)
+
 
 您也可以通过以下示例脚本轻松训练自己的模型。
 
