@@ -1,85 +1,117 @@
-- [English](README.md)
-- [中文](resource/README_zh.md)
+- [中文](README.md)
+- [English](resource/README_en.md)
 
 ---
 
 # Y-Trainer
-Welcome to Y-Trainer—an advanced training framework designed for LLM fine-tuning.
 
-# 🎯 Core Advantages:
+Y-Trainer 是一个LLM模型微调训练框架。
 
-- 📉 **Precision Targeting of Overfitting**: Expertly optimized to effectively resolve overfitting challenges in SFT.
+# 📊 核心优势：
 
-- 🧩 **Breakthrough the Forgetting Bottleneck**: Excels at preserving the model's generalization capabilities without relying on massive general corpora. It maintains core competencies while enabling specialized enhancement! 🏆
+- 📉 **精准对抗过拟合**： 专门优化，有效解决SFT中的过拟合难题。
 
-**Schedule:** Reinforcement Learning (RL) will be released **soon**.
+- 🧩 **突破遗忘瓶颈**： 无需依赖通用语料，即可卓越地保留模型的泛化能力，守住核心能力的同时实现专项提升！
 
-## Continued Pre-training
-Supports model pre-training methods, enabling efficient utilization of training data to improve the model's capabilities in specified domains.
+- 🏆 **单卡强化学习**：无需依赖参考模型、教师模型，仅需基础模型+奖励函数，即可稳定的进行强化学习训练。
 
-## Supervised Fine-tuning
-Unlike traditional SFT, we employ a proprietary training method that achieves the following effects:
+官网介绍： [Y-Trainer](https://y-agent/docs/y-trainer/introduction)
 
-- Limits the influence of incorrect knowledge in the corpus while preserving the base model's capabilities as much as possible.
-- Eliminates the need for dataset balancing, enabling fast convergence while almost never compromising the model's original capabilities.
+该框架包含以下三个核心组件：继续预训练（CPT）指令微调（SFT）强化学习（RL）[将**很快发布**需要配合Y-agent使用]。
 
-## Reinforcement Learning
-A brand-new reinforcement learning framework based on SFT, with the following advantages:
+## 持续预训练（Continued Pre-training）
 
-- **Low resource requirements:** No need for reference models, reward models, value networks, etc. Training can be completed by properly designing a reward function.
-- **Stable training:** Uses high-entropy tokens as branch nodes to automatically generate a corpus tree, then employs built-in clustering algorithms for pruning to ensure sufficient exploration. Combined with adaptive gradient calculation, the training process is stable and reliable.
+支持多种模型预训练方法，能够高效利用训练数据，提升模型在特定领域的能力。
 
+## 监督微调（Supervised Fine-tuning）
+
+与传统 SFT 不同，我们采用了一套自研的训练方法，具备如下优势：
+- 支持对训练预料进行评分。可以在训练之前，排查有问题的语料。
+- 在尽可能保留基座模型能力的前提下，限制语料中错误知识的影响；
+- 无需进行数据集平衡操作，实现快速收敛，同时几乎不会损害模型的原始能力。
+
+## 强化学习（Reinforcement Learning）
+
+基于 SFT 构建的全新强化学习框架，具有以下显著优势：
+
+- **低资源需求：** 无需依赖参考模型、奖励模型、价值网络等组件，仅需合理设计奖励函数即可完成训练；
+- **训练稳定：** 以高熵 token 作为分支节点，自动生成语料树，并通过内置聚类算法进行剪枝，确保充分的探索空间。结合自适应梯度计算策略，无需KL散度约束，整个训练过程更加稳定可靠。
 
 # Introduction
+> 注意：本项目可以用于qwen2.5、 qwen3系列模型，主要测试4B、7B、8B等模型，目前不支持Moe模型，如果其他需求请联系我们，同时欢迎开源工作者加入本项目。
 
-You can train a full model or just a LoRA adapter
+您既可以训练完整模型，也可以仅训练 LoRA 适配器。
 
-You can also train models in **single gpu** or **multi - GPUs**
+同时支持在**单 GPU** 或**多 GPU** 环境下进行训练。
 
 # Installation
+
+
 ```bash
-cd Y-TRAINER
+cd y-trainer
+
 pip install -r requirements.txt
 ```
 
 # Quick Start
 
-Start the Training Service
-You can start the training service by running the following command. (Before starting, you can modify the port and specify the large model folder in configs/server_config.py).
+通过命令启动训练服务（启动前可以通过configs/sever_config.py修改端口和指定大模型文件夹）
 
 ```bash
 python main.py
 ```
-Then, open your browser and navigate to:
-http://localhost:8010
 
-You can now use this professional AI text processing tool, which provides convenient features for training, integrated attention analysis, content compression, sample generation, and clustering-based filtering.
+浏览器打开：http://localhost:8010
 
+即可便捷使用训练、集成注意力分析、内容压缩、样本生成和聚类筛选功能的专业AI文本处理工具。
 
-You can easily use these scripts to train your own model. 
+您也可以通过以下示例脚本轻松训练自己的模型。
 
-Train the model in single GPU or multi - GPUs by following example scripts.
-
-## Single GPU
+单GPU
 ```bash
 # Continue pretraining
-bash y-trainer/scripts/pretrain_ds.sh
+bash scripts/pretrain_ds.sh
 
 # sft training
-bash y-trainer/scripts/sft.sh
+bash scripts/sft.sh
+# windows sft training
+./scripts/sft.bat
 ```
-## Multi - GPUs
+
+### 参数解释
+
+以SFT为例，其他类似
+```
+python -m start_training \
+    --model_path_to_load model_or_path \ # 需要训练的模型目录
+    --lora_path ./lora \ # 加载lora的文件目录（基于lora检查点继续训练是采用此方式）
+    --training_type 'sft' \ # 训练方式
+    --epoch 3 \ # 训练轮数
+    --checkpoint_epoch '0,1' \ # 保存检查点轮数
+    --use_NLIRG 'true'\  #核心算法，默认启用
+    --data_path ./data/sft_example.json \ # 加载数据集的位置，修改此参数，可以指定你的数据集文件
+    --output_dir outputdir \ # 输出的模型文件目录
+    --use_lora 'true' \  #使用lora方式进行训练
+    --batch_size 1 \ # 不建议修改，默认1
+    --token_batch 10 \ # 不建议修改，默认10
+    --enable_gradit_checkpoing 'true' \ # 开启梯度检查点
+    --lora_target_modules "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj" # 指定训练的网络层
+```
+
+[更多参数说明](https://y-agent/docs/y-trainer/config).
+
+多GPU
 ```bash
 # Continue pretraining
-bash y-trainer/scripts/pretrain_ds.sh
+bash scripts/pretrain_ds.sh
 
 # sft training
-bash y-trainer/scripts/sft_ds.sh
+bash scripts/sft_ds.sh
 ```
 
-## Training data description
+## 训练数据格式简介
 
-For cpt, see the json file in [cpt dataset example path](example_dataset/cpt_example.json)
+进行继续预训练时, 请参考 [此文件](../example_dataset/cpt_example.json)
 
 ```json
 [
@@ -94,7 +126,7 @@ For cpt, see the json file in [cpt dataset example path](example_dataset/cpt_exa
 ]
 ```
 
-For SFT, see the json file in [cpt dataset example path](example_dataset/sft_example.json)
+进行指令微调时, 请参考 [此文件](../example_dataset/sft_example.json)
 ```json
 [
   {
@@ -112,30 +144,28 @@ For SFT, see the json file in [cpt dataset example path](example_dataset/sft_exa
 ]
 ```
 
-*output* token will be trained only.
+只有*output*字段的token会被训练。
 
-For more tutorials see Y-Studio Document [Y-Studio Document url](https://www.y-agent.cn/docs)
+更多教程请参见 [Y-Studio 官方文档](https://www.y-agent.cn/docs)。
 
+# Y-Agent Studio 框架简介
 
-# Y-Agent Studio Framework
+**Y-Agent Studio** 框架**完全开源**、**可商用**。下载后即可**无限制**使用全部功能。
 
-The **Y-Agent Studio** framework is **fully open-source**, **commercially usable**, and **does not differentiate between community and commercial editions**. Once downloaded, you gain access to **all features without restriction**.
+该框架融合了**代码的灵活性**与**可视化界面的便捷性**，支持以下能力：
 
-It combines the **flexibility of coding** with the **convenience of a visual interface**, enabling:
+- **流程编排与迭代**
+- **自动化测试**
+- **语料标注与生产管理**
 
-- **Process orchestration and iteration**
-- **Automated testing**
-- **Corpus annotation and production/management**
+## ✅ 主要特性
 
+- 高度可定制的工作流，支持嵌套结构与有环的循环连接
+- 完善的日志系统，提供可视化展示与自动化分析
+- 开放的系统集成能力，可与您现有的 IT 系统无缝对接
+- 支持自动化测试、语料标注、语料生产与管理
+- 解决了垂直领域训练导致基座模型能力下降的问题
 
-## ✅ Features
+## 架构图（Architecture Diagram）
 
-- Highly customizable workflow, supporting nesting and cyclic (looped) connections
-- Comprehensive logging system, with visual representation and automated analysis
-- Open system integration capabilities, allowing seamless integration with your existing IT infrastructure
-- Automated testing, corpus annotation, and corpus production/management
-- The issue where vertical-domain training degrades base model capabilities
-
-## Architecture Diagram
-![Architecture Diagram](resource/system_architecture.webp)
-
+![架构图](system_architecture.webp)
