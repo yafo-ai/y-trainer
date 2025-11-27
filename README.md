@@ -168,4 +168,4 @@ bash scripts/sft_ds.sh
 
 ## 架构图（Architecture Diagram）
 
-![架构图](system_architecture.webp)
+![架构图](resource/system_architecture.webp)

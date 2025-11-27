@@ -140,4 +140,3 @@ It combines the **flexibility of coding** with the **convenience of a visual int
 
 ## Architecture Diagram
 ![Architecture Diagram](resource/system_architecture.webp)
-
