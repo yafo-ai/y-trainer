@@ -118,7 +118,7 @@ class TokenLevelSplitter(Dataset):
     
     
 class TrainerSFT(TrainerBase):
-    """CPT训练器"""
+    """SFT训练器"""
     def __init__(self, config:TrainConfig,checkpoint_callback):
         super().__init__(config)
         self.checkpoint_callback=checkpoint_callback

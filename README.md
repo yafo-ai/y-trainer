@@ -61,7 +61,9 @@ pip install -r requirements.txt
 python main.py
 ```
 
-浏览器打开：http://localhost:8010；linux无法直接打开浏览器的云服务器，可以通过ssh连接到云服务器，即可在本地浏览器打开。
+浏览器打开：http://localhost:8010
+
+linux无法直接打开浏览器的云服务器，可以通过ssh连接到云服务器，即可在本地浏览器打开。
 
 例如： ssh -p 39114 -L 0.0.0.0:8010:localhost:8010 root@connect.xxx.sss.com
 

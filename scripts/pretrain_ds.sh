@@ -5,7 +5,7 @@ deepspeed --master_port 29501 --include localhost:0,1 --module start_training \
     --training_type 'cpt' \
     --checkpoint_epoch '0,1,2' \
     --batch_size 2 \
-    --use_deepspeed \
+    --use_deepspeed 'true'\
     --pack_length 1024 \
     --data_path data/cpt_example.json \
     --output_dir outputdir \

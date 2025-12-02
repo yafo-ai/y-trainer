@@ -232,7 +232,7 @@ class TrainEngine:
 
             sampler = DistributedSampler(dataset, rank=self._config.local_rank, num_replicas=dist.get_world_size(), shuffle=False)
             batcher = DataLoader(dataset, batch_size=self._config.batch_size, shuffle=False, collate_fn=collate_fn, sampler=sampler)
-            model,optimizer, _, _ = deepspeed.initialize(model=model, config=ds_config_dict)
+            model, _, _, _ = deepspeed.initialize(model=model, config=ds_config_dict)
 
         else:
             device = f'cuda:{self._config.local_rank}'
