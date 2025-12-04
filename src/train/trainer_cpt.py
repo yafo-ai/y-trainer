@@ -6,6 +6,7 @@ import json
 
 from tqdm import tqdm
 from src.train.config import TrainConfig
+from src.train.data_loader import MultiFormatDataLoader
 from src.train.trainer_base import TrainerBase
 from src.train.utils import dynamic_sigmoid_batch
 # 设置日志
@@ -42,7 +43,20 @@ class TrainerCPT(TrainerBase):
 
     def load_dataset(self,tokenizer)->Dataset:
 
-        cpt_train_texts, data_ids = self._load_texts_from_json()
+        # cpt_train_texts, data_ids = self._load_texts_from_json()
+        loader = MultiFormatDataLoader(
+            file_paths=self._config.data_path,
+        )
+        data= loader.load_data()
+
+
+        cpt_train_texts = []
+        data_ids = []
+        for item in data:
+            cpt_train_texts.append(item["output"])
+            data_ids.append(item["data_id"])
+        
+       
         packed_input_ids, packed_segment_ids = self._pack_sequences_with_segment_ids(
             cpt_train_texts, 
             data_ids,

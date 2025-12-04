@@ -291,10 +291,10 @@
                                             onclick="copyfn('#data_path_select')"
                                             class="c-primary-btn">复制</span></label>
                                     <div class="flexbox">
-                                        <input onblur="getdata_path()" style="width: 100px;" type="text"
+                                        <input onblur="getdata_path()" style="width: calc(100% - 230px);" type="text"
                                             class="param-input" name="data_path_first" placeholder="" value="./data">
-                                        <select style="width: calc(100% - 150px);" class="param-input"
-                                            id="data_path_select" name="data_path">
+                                        <select style="width: 160px" class="param-input"
+                                            id="data_path_select" multiple name="data_path">
 
                                         </select>
                                         <button style="height: 28px;width: 60px;margin-left: 10px;font-size: 12px;"
@@ -873,6 +873,7 @@
 
 
         function init() {
+            $('#data_path_select').select2()
             getdata_path();
             $('.training_type .sub-module-btn').on('click', function () {
                 $(this).addClass('active').siblings().removeClass('active');
@@ -986,8 +987,9 @@
 
         function getdata_path() {
             // 
-            $('#data_path_select').val('').html('');
+            $('#data_path_select').html('');
             var path = $('.start_train input[name="data_path_first"]').val();
+            
             if (!path) return false;
             $ajax('/api/train/list_dataset', {
                 "data_dir": path,
@@ -999,7 +1001,10 @@
                         var item = arr[i];
                         mySelectHtml += '<option value="' + item.data_path + '">' + item.name + '</option>';
                     }
-                    $('#data_path_select').html(mySelectHtml);
+                    $('#data_path_select').append(mySelectHtml);
+                    setTimeout(function(){
+                        $('#data_path_select').select2()
+                    },100)
                 }
             })
 

@@ -2,7 +2,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 class LoadDataRequest(BaseModel):
-    data_path: str = ""
+    data_path: List[str] = []
 
 class ListDataSetRequest(BaseModel):
     data_dir: str = ""
@@ -12,7 +12,7 @@ class LoraRequest(BaseModel):
 
 class TrainConfigRequest(BaseModel):
     model_path_to_load: str
-    data_path: str
+    data_path: List[str] = []
     output_dir: str
     use_lora: bool = False
     data_type: str = "bfloat16"

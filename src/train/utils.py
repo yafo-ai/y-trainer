@@ -18,16 +18,14 @@ def masked_mean(losses: torch.Tensor) -> torch.Tensor:
     :return:
     """
     mask = (losses != 0)
-    
-    # select all loss that is not 0
-    valid_losses = losses[mask]
-    
-    num_valid = valid_losses.numel()
+
+    # count number of non-zero loss
+    num_valid = mask.sum()
 
     if num_valid > 0:
-        return valid_losses.mean()
+        return losses.sum() / num_valid
     else:
-        return torch.tensor(0.0, device=losses.device)
+        return losses.sum() / 1
 
 
 def _calculate_sigmoid_weights(exponent, max_lr, min_lr=0):
