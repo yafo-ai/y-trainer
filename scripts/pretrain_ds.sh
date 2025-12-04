@@ -11,4 +11,5 @@ deepspeed --master_port 29501 --include localhost:0,1 --module start_training \
     --output_dir outputdir \
     --epoch 3 \
     --use_NLIRG 'true' \
+    --enable_gradit_checkpoing 'true' \
     --lora_target_modules "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj"

@@ -10,5 +10,6 @@ deepspeed --master_port 29501 --include localhost:0,1 --module start_training \
     --batch_size 1 \
     --token_batch 10 \
     --use_lora 'true' \
-    --epoch: 3 \
+    --enable_gradit_checkpoing 'true' \
+    --epoch 3 \
     --lora_target_modules "q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj"

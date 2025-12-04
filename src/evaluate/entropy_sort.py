@@ -6,6 +6,8 @@ import torch.nn.functional as F
 import numpy as np
 from tqdm import tqdm
 
+from src.train.data_loader import MultiFormatDataLoader
+
 def is_garbled(text):
     return "<unk>" in text or "�" in text
     
@@ -197,7 +199,6 @@ def filtered_rank(model, tokenizer, datas):
 
     for d in tqdm(datas):
         
-
         instruction = d['instruction']
 
         sft_output = d['output']
@@ -236,31 +237,35 @@ def arg_parse():
 
 def evaluate_loss(data_path,model_path,output_path,method,sort=True):
 
-    with open(data_path, 'r') as f:
-        datas = json.load(f)
+    loader = MultiFormatDataLoader(
+            file_paths=data_path,
+            skip_empty=True
+        )
+     
+    datas = loader.load_data()
 
-        from transformers import AutoTokenizer, AutoModelForCausalLM
+    from transformers import AutoTokenizer, AutoModelForCausalLM
 
-        model = AutoModelForCausalLM.from_pretrained(model_path).to(torch.bfloat16).cuda()
+    model = AutoModelForCausalLM.from_pretrained(model_path).to(torch.bfloat16).cuda()
 
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
 
-        rank_func = similarity_rank if method == "similarity_rank" else filtered_rank
+    rank_func = similarity_rank if method == "similarity_rank" else filtered_rank
 
-        sorted_indices, scores = rank_func(model, tokenizer, datas)
+    sorted_indices, scores = rank_func(model, tokenizer, datas)
 
-        step = 1 if sort else -1
+    step = 1 if sort else -1
 
-        sorted_data = []
-        for idx in sorted_indices[::step]:
-            score = scores[idx]
-            datas[idx]['score'] = score
-            sorted_data.append(datas[idx])
+    sorted_data = []
+    for idx in sorted_indices[::step]:
+        score = scores[idx]
+        datas[idx]['score'] = score
+        sorted_data.append(datas[idx])
 
-        with open(output_path, 'w') as f:
-            json.dump(sorted_data, f, ensure_ascii=False, indent=4)
+    with open(output_path, 'w') as f:
+        json.dump(sorted_data, f, ensure_ascii=False, indent=4)
 
-        print(f"语料难易程度评估完成，结果已经保存至{output_path}")
+    print(f"语料难易程度评估完成，结果已经保存至{output_path}")
 
 
 # def main():

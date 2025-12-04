@@ -8,12 +8,15 @@ import time
 from fastapi import APIRouter, Body, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
+import torch
 from tqdm import tqdm
 from src.evaluate.entropy_sort import evaluate_loss
 from src.models.train_model import EvaluateLossRequest, EvaluateResultRequest, ListDataSetRequest, LoadDataRequest, LoraRequest, MergeModelsRequest, TrainConfigRequest
 from src.train.config_manager import TrainConfigManager
+from src.train.data_loader import MultiFormatDataLoader
 from src.train.train_engine import TrainEngine, merge_lora_with_base
 from src.ext.model_loader import global_model_loader
+
 
 router = APIRouter(
     prefix="/api/train",
@@ -27,11 +30,10 @@ training_lock = asyncio.Lock()
 
 @router.post("/load_dataset")
 async def load_dataset(request: LoadDataRequest):
-    
-    # 有个大json文件，我只需加载100条数据
-    with open(request.data_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    return JSONResponse(data)
+    loader = MultiFormatDataLoader(
+            file_paths=request.data_path
+        )
+    return JSONResponse(loader.load_data())
 
 @router.post("/list_dataset")   
 async def list_dataset(request: ListDataSetRequest):
@@ -99,18 +101,93 @@ async def start_train(request: TrainConfigRequest):
         config_dict = request.model_dump()
         config = TrainConfigManager.register_from_dict(config_dict)
 
-        # 启动训练的后台任务
-        async def run_training():
-            """
-            实际的训练任务函数。
-            """
-            try:
-                await asyncio.to_thread(lambda: TrainEngine(config).start_train())
-            finally:
-                global is_training
-                is_training = False
+        if config.use_deepspeed:
+            # 请使用脚本启动 deepspeed 训练
+            # raise Exception("Please use the script to start deepspeed training.")
+        
+            # 使用 subprocess 启动 deepspeed 训练
+            import subprocess
+            import sys
+            from src.utils.misc import find_available_port,get_device_count
+            device_count = get_device_count()
+            if device_count > 0:
+                device_list = ",".join(str(i) for i in range(device_count))
+                include_arg = f"localhost:{device_list}"
+            else:
+                include_arg = "localhost:0"  # 默认使用第一个设备
+    
+            deepspeed_cmd = [
+                "deepspeed",
+                "--master_port", str(find_available_port()),
+                "--include",include_arg,
+                "--module", "start_training",
+                "--model_path_to_load", config.model_path_to_load,
+                "--data_type", "bfloat16" if config.data_type==torch.bfloat16 else "float16" if config.data_type==torch.float16 else "float32",
+                "--use_lora", str(config.use_lora).lower(),
+                "--lora_rank", str(config.lora_rank),
+                "--lora_alpha", str(config.lora_alpha),
+                "--lora_dropout", str(config.lora_dropout),
+                "--lora_target_modules", ','.join(item for item in config.lora_target_modules),
+                "--data_path", ','.join(item for item in config.data_path),
+                "--training_type", str(config.training_type.value),
+                "--enable_gradit_checkpoing", str(config.gradit_checkpoing).lower(),
+                "--epoch", str(config.epoch),
+                "--lr", str(config.lr),
+                "--batch_size", str(config.batch_size),
+                "--gradient_accumulation_steps", str(config.gradient_accumulation_steps),
+                "--max_seq_len", str(config.max_seq_len),
+                '--use_deepspeed', str(config.use_deepspeed).lower(),
+                "--pack_length", str(config.pack_length),
+                "--use_NLIRG", str(config.use_nlirg).lower(),
+                "--token_batch", str(config.token_batch),
+                "--output_dir", str(config.output_dir),
+                "--use_tensorboard", str(config.use_tensorboard).lower(),
+                ]
 
-        asyncio.create_task(run_training())
+            if len(config.checkpoint_epoch)>0:
+                deepspeed_cmd.append("--checkpoint_epoch")
+                deepspeed_cmd.append(','.join(item for item in config.checkpoint_epoch))
+            
+            deepspeed_cmd.append("--system_prompt")
+            deepspeed_cmd.append(f'"{config.system_prompt}"')
+
+            if config.lora_path:
+                deepspeed_cmd.append("--lora_path")
+                deepspeed_cmd.append(config.lora_path)
+            if config.tensorboard_path:
+                deepspeed_cmd.append("--tensorboard_path")
+                deepspeed_cmd.append(config.tensorboard_path)
+
+
+            # 启动 deepspeed 进程
+            process = subprocess.Popen(
+                " ".join(deepspeed_cmd),  # 将列表转换为字符串
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True
+            )
+
+
+            # 实时输出日志
+            for line in process.stdout:
+                print(line, end='')
+            is_training = False
+
+        else:
+
+            # 启动训练的后台任务
+            async def run_training():
+                """
+                实际的训练任务函数。
+                """
+                try:
+                    await asyncio.to_thread(lambda: TrainEngine(config).start_train())
+                finally:
+                    global is_training
+                    is_training = False
+
+            asyncio.create_task(run_training())
 
         return JSONResponse({"message": "Training started"})
     

@@ -95,7 +95,7 @@ class TrainConfig:
     gradient_accumulation_steps: int=1
 
     # 训练数据路径
-    data_path: str=""
+    data_path: List[str]=None
 
     # 输出目录
     output_dir: str=""
@@ -158,22 +158,26 @@ class TrainConfig:
         # 验证对象属性
         self._validate()
 
-        #保存训练配置
-        self._save()
+        # #保存训练配置
+        # self._save()
 
 
     def _validate(self) -> None:
         """验证模型配置"""
         if not os.path.exists(self.model_path_to_load):
-            logger.warning(f"Model path does not exist: {self.model_path_to_load}")
+            logger.error(f"Model path does not exist: {self.model_path_to_load}")
             raise Exception(f"Model path does not exist: {self.model_path_to_load}")
         if not any(os.listdir(self.model_path_to_load)):
-            logger.warning(f"Model path is empty: {self.model_path_to_load}")
+            logger.error(f"Model path is empty: {self.model_path_to_load}")
             raise Exception(f"Model path is empty，please save model to->{self.model_path_to_load}")
     
-        if not os.path.exists(self.data_path):
-            logger.warning(f"Data path does not exist->{self.data_path}")
-            raise Exception(f"Data path does not exist: {self.data_path}")  
+        if self.data_path is None or len(self.data_path) == 0:
+            logger.error("Data path is not provided.")
+            raise Exception("Data path is not provided.")
+        for path in self.data_path:
+            if not os.path.exists(path):
+                logger.error(f"Data path does not exist->{path}")
+                raise Exception(f"Data path does not exist: {path}")  
         
         if not os.path.exists(self.output_dir):
             logger.info(f"Creating output directory: {self.output_dir}")
