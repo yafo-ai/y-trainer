@@ -49,6 +49,81 @@
         <div class="main-layout">
             <!-- Main Content -->
             <main class="main-content">
+                
+                <div class="config-panel evaluate_loss">
+                    <div class="config-header">
+                        
+                    <h1 class="module-title">
+                        <i class="fas fa-star-half-alt"></i>
+                        训练语料评估 
+                    </h1>
+                     <label class="param-label">语料质量评估工具：分数越高学习困难度越大，需要排查语料中存在的问题。（非必要过程，但是建议先评估后训练）</label>
+                    
+                    </div>
+                    <div class="config-content">
+                        <div class="params-column">
+                            <div class="params-grid">
+                                <div class="param-group">
+                                    <label class="param-label">模型路径</label>
+                                    <input type="text" class="param-input" name="model_path" placeholder="" value="">
+                                </div>
+
+                                <div class="param-group">
+                                    <label class="param-label">要评估语料路径：必须是包含文件名的完整路径</label>
+                                    <input type="text" class="param-input" name="data_path" placeholder="" value="">
+                                </div>
+
+                                <div class="param-group">
+                                    <label class="param-label">选择算法</label>
+                                    <select id="my-select3" name="method" style="max-width: 340px;" class="param-input">
+                                        <!-- 更多选项 -->
+                                        <option value="">请选择</option>
+                                        <option value="similarity_rank">similarity_rank</option>
+                                        <option value="filtered_rank">filtered_rank</option>
+                                    </select>
+                                </div>
+
+                                <div class="param-group">
+                                    <label class="param-label">&nbsp;</label>
+                                    <div class="action-buttons">
+
+                                        <button style="height: 28px;font-size: 12px;" class="btn btn-secondary"
+                                            onclick="reset('evaluate_loss')">
+                                            <i class="fas fa-redo"></i> 重置
+                                        </button>
+                                        <button style="height: 28px;font-size: 12px;" class="btn btn-primary"
+                                            onclick="startExa()">
+                                            <i class="fas fa-play"></i> 开始评估
+                                        </button>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="param-group" >
+                                    <label class="param-label">评估结果将保存到以下位置</label>
+                                    <input type="text" class="param-input" disabled
+                                            name="output_path" placeholder="" value="" readonly>
+                                </div>
+                                
+                                <div class="param-group" >
+                                    <label class="param-label">&nbsp;</label>
+                                    <div class="flexbox">
+                                        <button style="height: 28px;font-size: 12px;"
+                                            class="btn btn-primary" onclick="evaluate_resultfn()">
+                                            查看结果
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
                 <div class="module-header sub-module-nav-md">
                     <h1 class="module-title">
                         <i class="fas fa-band-aid"></i>
@@ -418,8 +493,11 @@
 
                 <div class="config-panel merge_models">
                     <div class="config-header">
-                        <i class="fas fa-sliders-h"></i>
-                        Lora合并工具
+                        <h1 class="module-title">
+                            <i class="fas fa-puzzle-piece"></i>
+                            Lora合并工具
+                        </h1>
+
 
                     </div>
                     <div class="config-content">
@@ -462,84 +540,6 @@
                         </div>
                     </div>
                 </div>
-
-
-                <div class="config-panel evaluate_loss">
-                    <div class="config-header">
-                        <i class="fas fa-sliders-h"></i>
-                        样本困难度评估工具 （备注：分数越高学习困难度越大）
-
-                    </div>
-                    <div class="config-content">
-                        <div class="params-column">
-                            <div class="params-grid">
-                                <div class="param-group">
-                                    <label class="param-label">模型路径</label>
-                                    <input type="text" class="param-input" name="model_path" placeholder="" value="">
-                                </div>
-
-                                <div class="param-group">
-                                    <label class="param-label">要评估语料路径</label>
-                                    <input type="text" class="param-input" name="data_path" placeholder="" value="">
-                                </div>
-
-                                <div class="param-group">
-                                    <label class="param-label">选择算法</label>
-                                    <select id="my-select3" name="method" style="max-width: 340px;" class="param-input">
-                                        <!-- 更多选项 -->
-                                        <option value="">请选择</option>
-                                        <option value="similarity_rank">similarity_rank</option>
-                                        <option value="filtered_rank">filtered_rank</option>
-                                    </select>
-                                </div>
-
-                                <div class="param-group">
-                                    <label class="param-label">&nbsp;</label>
-                                    <div class="action-buttons">
-
-                                        <button style="height: 28px;font-size: 12px;" class="btn btn-secondary"
-                                            onclick="reset('evaluate_loss')">
-                                            <i class="fas fa-redo"></i> 重置
-                                        </button>
-                                        <button style="height: 28px;font-size: 12px;" class="btn btn-primary"
-                                            onclick="startExa()">
-                                            <i class="fas fa-play"></i> 开始评估
-                                        </button>
-                                    </div>
-
-                                </div>
-
-
-                                <div class="param-group">
-                                    <label class="param-label">语料评估完成将保存的路径</label>
-                                    <div class="flexbox">
-                                        <input style="width: calc(100% - 70px);" type="text" class="param-input"
-                                            name="output_path" placeholder="" value="">
-                                        <button style="height: 28px;width: 60px;margin-left: 10px;font-size: 12px;"
-                                            class="btn btn-primary" onclick="evaluate_resultfn()">
-                                            预览
-                                        </button>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             </main>
@@ -1134,7 +1134,7 @@
             $ajax('/api/train/evaluate_loss', params, function (res) {
                 if (res.code == 200 && res.data) {
                     $('.evaluate_loss [name="output_path"]').val(res.data.output_path)
-                    alert('评估任务开启，请耐心等待。')
+                    alert('评估任务开启，请耐心等待。可在最下方控制台中查看进度。')
                 }
             })
         }

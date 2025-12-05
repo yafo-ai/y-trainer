@@ -218,7 +218,9 @@ async def eval_loss(request: EvaluateLossRequest = Body(...)):
         stem, ext = os.path.splitext(file_name)
         new_file_name = f"{stem}_{uuid.uuid4().hex}{ext}"
         output_path = os.path.join(dir_name, new_file_name)
-        
+        # 确保输出文件总是有.json扩展名
+        if output_path != '.json':
+            output_path += '.json'
         async def run_evaluate_loss():
             """
             实际的训练任务函数。

@@ -262,7 +262,7 @@ def evaluate_loss(data_path,model_path,output_path,method,sort=True):
         datas[idx]['score'] = score
         sorted_data.append(datas[idx])
 
-    with open(output_path, 'w') as f:
+    with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(sorted_data, f, ensure_ascii=False, indent=4)
 
     print(f"语料难易程度评估完成，结果已经保存至{output_path}")
