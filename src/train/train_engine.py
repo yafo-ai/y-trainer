@@ -97,6 +97,11 @@ class TrainEngine:
             self._config.world_size = WORLD_SIZE
             
             torch.cuda.set_device(LOCAL_RANK)
+
+            if self._config.world_size>10 and self._config.use_nlirg:
+                logger.error("NLIRG is not supported in distributed training with more than 10 gpus.")
+                raise ValueError("NLIRG is not supported in distributed training with more than 10 gpus.")
+                
         
             if LOCAL_RANK == 0:
                 logger.info(f"Initializing distributed training environment: local rank {LOCAL_RANK} with {WORLD_SIZE} gpus.")
