@@ -52,16 +52,16 @@ class SampleDataset(Dataset):
         for data_item in sample_data:
             sample = self._process_sample(data_item)
             token_samples=self._split_sample(sample)
-            group_token_samples.append(token_samples)
+            group_token_samples.extend(token_samples)
 
         consumers = self.world_size * self.batch_size
         # 对token样本进行调度分配，确保每个消费者获取的样本相对顺序均衡，避免破坏一组token样本的先后顺序，导致效果下降
-        new_group_token_samples = schedule_element_consumption(group_token_samples, consumers) if consumers > 1 else group_token_samples
+        # new_group_token_samples = schedule_element_consumption(group_token_samples, consumers) if consumers > 1 else group_token_samples
 
-        datas=[]
-        for group in new_group_token_samples:
-            for token_sample in group:
-                datas.append(token_sample)
+        datas=group_token_samples
+        # for group in new_group_token_samples:
+        #     for token_sample in group:
+        #         datas.append(token_sample)
         
         len_datas=len(datas)
         # 截断多余的数据，确保数据量可以被消费者数量整除
@@ -132,8 +132,8 @@ class SampleDataset(Dataset):
         lables = sample['labels']
         train_token_indices = torch.where(lables != -100)[0]
         token_num = train_token_indices.shape[-1] // self.token_size
-        if train_token_indices.shape[-1] % self.token_size  != 0:
-            token_num += 1
+        if token_num == 0:
+            token_num = 1
         to_lable_idx_start = train_token_indices[0]
         token_sample=[]
         for token_ep in range(token_num):
