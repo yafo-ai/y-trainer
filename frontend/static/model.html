@@ -64,12 +64,12 @@
                         <div class="params-column">
                             <div class="params-grid">
                                 <div class="param-group">
-                                    <label class="param-label">模型路径</label>
+                                    <label class="param-label"><span class="c-danger">*</span>模型路径</label>
                                     <input type="text" class="param-input" name="model_path" placeholder="" value="">
                                 </div>
 
                                 <div class="param-group">
-                                    <label class="param-label">要评估语料路径：必须是包含文件名的完整路径</label>
+                                    <label class="param-label"><span class="c-danger">*</span>要评估语料路径：必须是包含文件名的完整路径</label>
                                     <input type="text" class="param-input" name="data_path" placeholder="" value="">
                                 </div>
 
@@ -178,7 +178,7 @@
                         <div class="params-column">
                             <div class="params-grid">
                                 <div class="param-group">
-                                    <label class="param-label"> <span class="c-danger">*</span> 要训练的模型
+                                    <label class="param-label"> <span class="c-danger">*</span> 要训练的模型：请将模型文件放入big-models目录下
                                         <span onclick="copyfn('#model_path_to_load')" class="c-primary-btn">复制</span>
                                     </label>
                                     <select style="max-width: 340px;" class="param-input" id="model_path_to_load"
@@ -362,7 +362,7 @@
 
                                 <div class="param-group">
                                     <label class="param-label"> <span class="c-danger">*</span> 数据路径 <span
-                                            style="margin-left: 50px;">数据集</span> <span
+                                            style="margin-left: 50px;"><span class="c-danger">*</span>数据集</span> <span
                                             onclick="copyfn('#data_path_select')"
                                             class="c-primary-btn">复制</span></label>
                                     <div class="flexbox">
@@ -389,7 +389,8 @@
 
                                 <div class="param-group">
                                     <label class="param-label"> <span class="c-danger">*</span>
-                                        token_batch(每批几个token)</label>
+                                        token_batch(每批几个token)<span
+                                            title="数量越大速度越快，但是效果越差，建议设置为10，最大不要超过20" class="far fa-question-circle"></span></label>
                                     <input type="number" class="param-input" name="token_batch" value="10">
                                 </div>
 
@@ -420,26 +421,17 @@
 
 
                                 <div class="param-group">
-                                    <label class="param-label">需要保存的检查点</label>
+                                    <label class="param-label">需要保存的检查点（输入数字回车即可）</label>
 
-                                    <select multiple="multiple" name="checkpoint_epoch" id="my-select1">
+                                    <select multiple="multiple" name="checkpoint_epoch" id="checkpoint-select">
                                         <!-- 更多选项 -->
                                     </select>
 
-
-
                                 </div>
 
-
-
-
-
-
-
-
                                 <div class="param-group">
-                                    <label class="param-label"> <span class="c-danger">*</span> 训练结果输出路径</label>
-                                    <input type="text" class="param-input" name="output_dir" placeholder="" value="">
+                                    <label class="param-label"> <span class="c-danger">*</span> 训练权重文件的保存路径</label>
+                                    <input type="text" class="param-input" name="output_dir" placeholder="" value="./saved_models">
                                 </div>
 
 
@@ -838,7 +830,7 @@
                 epoch: $('.start_train [name="epoch"]').val(),
                 lr: $('.start_train [name="lr"]').val(),
                 lora_target_modules: $('#my-select').val() ? $('#my-select').val().split(/,|，|\s+/) : [],
-                checkpoint_epoch: $('#my-select1').val(),
+                checkpoint_epoch: $('#checkpoint-select').val(),
                 batch_size: $('.start_train [name="batch_size"]').val(),
                 token_batch: $('.start_train [name="token_batch"]').val(),
                 pack_length: $('.start_train [name="pack_length"]').val(),
@@ -892,9 +884,9 @@
                 var isChecked = $(this).prop('checked');
                 if (isChecked) {
                     // 多卡分布式训练  启用 需要保存的检查点 禁用
-                    $('#my-select1').attr('disabled', true);
+                    $('#checkpoint-select').attr('disabled', true);
                 } else {
-                    $('#my-select1').attr('disabled', false);
+                    $('#checkpoint-select').attr('disabled', false);
                 }
             })
 
@@ -926,7 +918,22 @@
                 }
             })
 
-
+            // 监听epoch输入框的变化，动态更新checkpoint_epoch下拉框
+            $('.start_train input[name="epoch"]').on('input change', function () {
+                var epochValue = parseInt($(this).val());
+                if (!isNaN(epochValue) && epochValue > 0) {
+                    // 创建从0开始到epochValue-1的数组
+                    var arr = [];
+                    for (var i = 0; i < epochValue; i++) {
+                        arr.push(i.toString());
+                    }
+                    // 更新下拉框选项
+                    initSelect(arr, $('#checkpoint-select'));
+                } else {
+                    // 如果输入无效或为0，提供默认选项
+                    initSelect(["0"], $('#checkpoint-select'));
+                }
+            });
 
             $('.start_train input[name="isloraPath"]').on('change', function () {
                 var isChecked = $(this).prop('checked');
@@ -952,8 +959,12 @@
             })
 
             // 初始化下拉选择框内容
-            var arr1 = ["1", "2", "3"]
-            initSelect(arr1, $('#my-select1'))
+            var epochValue = parseInt($('.start_train input[name="epoch"]').val()) || 3;
+            var arr1 = [];
+            for (var i = 0; i < epochValue; i++) {
+                arr1.push(i.toString());
+            }
+            initSelect(arr1, $('#checkpoint-select'))
 
             // var arr = ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"];
             // initSelect(arr, $('#my-select'))

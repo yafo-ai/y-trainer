@@ -10,6 +10,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
 import torch
 from tqdm import tqdm
+from datetime import datetime
 from src.evaluate.entropy_sort import evaluate_loss
 from src.models.train_model import EvaluateLossRequest, EvaluateResultRequest, ListDataSetRequest, LoadDataRequest, LoraRequest, MergeModelsRequest, TrainConfigRequest
 from src.train.config_manager import TrainConfigManager
@@ -99,8 +100,10 @@ async def start_train(request: TrainConfigRequest):
 
         # 在这里放置你真正的训练代码
         config_dict = request.model_dump()
+        # 为每个训练添加一个时间戳
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        config_dict["output_dir"] = os.path.join(config_dict["output_dir"], f"train_{timestamp}")
         config = TrainConfigManager.register_from_dict(config_dict)
-
         if config.use_deepspeed:
             # 请使用脚本启动 deepspeed 训练
             # raise Exception("Please use the script to start deepspeed training.")
