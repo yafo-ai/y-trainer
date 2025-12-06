@@ -65,12 +65,12 @@
                             <div class="params-grid">
                                 <div class="param-group">
                                     <label class="param-label"><span class="c-danger">*</span>模型路径</label>
-                                    <input type="text" class="param-input" name="model_path" placeholder="" value="">
+                                    <input type="text" class="param-input" name="model_path" placeholder="" value="./big-models/">
                                 </div>
 
                                 <div class="param-group">
                                     <label class="param-label"><span class="c-danger">*</span>要评估语料路径：必须是包含文件名的完整路径</label>
-                                    <input type="text" class="param-input" name="data_path" placeholder="" value="">
+                                    <input type="text" class="param-input" name="data_path" placeholder="" value="./data">
                                 </div>
 
                                 <div class="param-group">
@@ -496,21 +496,21 @@
                         <div class="params-column">
                             <div class="params-grid">
                                 <div class="param-group">
-                                    <label class="param-label">基座模型路径</label>
+                                    <label class="param-label"><span class="c-danger">*</span>基座模型路径</label>
                                     <input type="text" class="param-input" name="base_model_path" placeholder=""
-                                        value="">
+                                        value="./big-models/">
                                 </div>
 
                                 <div class="param-group">
-                                    <label class="param-label">Lora路径</label>
+                                    <label class="param-label"><span class="c-danger">*</span>Lora路径</label>
 
-                                    <input type="text" class="param-input" name="lora_path" placeholder="" value="">
+                                    <input type="text" class="param-input" name="lora_path" placeholder="" value="./saved_models/">
 
                                 </div>
 
                                 <div class="param-group">
-                                    <label class="param-label">合并后的模型路径</label>
-                                    <input type="text" class="param-input" name="output_path" placeholder="" value="">
+                                    <label class="param-label"><span class="c-danger">*</span>合并后的模型路径</label>
+                                    <input type="text" class="param-input" name="output_path" placeholder="" value="./merged_models/name">
                                 </div>
 
                                 <div class="param-group">
