@@ -219,8 +219,11 @@ async def eval_loss(request: EvaluateLossRequest = Body(...)):
         new_file_name = f"{stem}_{uuid.uuid4().hex}{ext}"
         output_path = os.path.join(dir_name, new_file_name)
         # 确保输出文件总是有.json扩展名
-        if output_path != '.json':
-            output_path += '.json'
+        if not output_path.endswith('.json'):
+            if output_path.endswith('.'):
+                output_path = output_path[:-1] + '.json'
+            else:
+                output_path += '.json'
         async def run_evaluate_loss():
             """
             实际的训练任务函数。
