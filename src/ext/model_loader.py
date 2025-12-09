@@ -4,7 +4,6 @@ import threading
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-from src.configs.server_config import MODEL_DIR
 from src.utils.file_helper import FileHelper
 
 class ModelLoader:
@@ -28,6 +27,8 @@ class ModelLoader:
 
     def load_model(self):
         if self._model is None:
+            if self.model_path is None:
+                raise Exception(f"请先加载模型")
             if not os.path.exists(self.model_path):
                 raise Exception(f"模型路径不存在: {self.model_path}")
             if not any(os.listdir(self.model_path)):
@@ -45,6 +46,12 @@ class ModelLoader:
     
     def load_tokenizer(self):
         if self._tokenizer is None:
+            if self.model_path is None:
+                raise Exception(f"请先加载模型")
+            if not os.path.exists(self.model_path):
+                raise Exception(f"模型路径不存在: {self.model_path}")
+            if not any(os.listdir(self.model_path)):
+                raise Exception(f"模型路径为空，请先保存模型到->{self.model_path}")
             try:
                 self._tokenizer = AutoTokenizer.from_pretrained(
                     self.model_path,
@@ -83,21 +90,10 @@ class ModelLoader:
         self.unload_model()
         self.unload_tokenizer()
 
-def get_global_model_loader():
-    
-    try:
-        paths=FileHelper.get_file_paths(MODEL_DIR)
-        if len(paths)>0:
-            return ModelLoader(FileHelper.get_file_paths(MODEL_DIR)[0])
-        else:
-            return ModelLoader(MODEL_DIR)
-        
-    except Exception as e:
-        print(f"获取全局模型加载器失败: {e}")
-        return None
+
     
 
-global_model_loader = get_global_model_loader()
+global_model_loader = ModelLoader(None)
 
 
 
