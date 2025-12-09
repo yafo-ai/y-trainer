@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Body, UploadFile, Form
 from fastapi.exceptions import RequestValidationError
 
-from src.configs.server_config import  MODEL_DIR
 from src.ext.model_loader import global_model_loader
 from src.utils.file_helper import FileHelper
 
@@ -24,7 +23,7 @@ def current_model_name():
 
 @router.get("/get_models", summary="获取所有模型")
 def get_models():
-    return {"model_name": FileHelper.get_file_paths(MODEL_DIR)}
+    return {"model_name": []}
 
 
 @router.get("/change_model", summary="切换模型")

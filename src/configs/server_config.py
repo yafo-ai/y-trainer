@@ -1,3 +1,2 @@
 FASTAPI_HOST = "0.0.0.0"
 FASTAPI_PORT = 8010
-MODEL_DIR="./big-models/"
