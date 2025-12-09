@@ -8,7 +8,7 @@ from fastapi_offline import FastAPIOffline
 from starlette.responses import JSONResponse, FileResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from src.api import base_api,feature_api, train_api
+from src.api import base_api,feature_api, path_api, train_api
 from src.models.customer_exception import CustomerException
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Request
@@ -31,8 +31,9 @@ app = FastAPIOffline(lifespan=lifespan)
 app.include_router(feature_api.router)
 app.include_router(base_api.router)
 app.include_router(train_api.router)
+app.include_router(path_api.router)
 
-app.mount("/", StaticFiles(directory="./frontend/static",html=True), name="static")
+# app.mount("/", StaticFiles(directory="./frontend/static",html=True), name="static")
 
 @app.middleware("http")
 async def wrap_response(request: Request, call_next):
@@ -108,25 +109,25 @@ async def all_exception_handler(request: Request, exc: Exception):
     )
 
 
-# @app.get("/{path:path}", summary="vue前端history模式路由", tags=['前端页面路由'])
-# async def catch_all(path: str):
-#     file_path = f"./frontend"
-#     if path.startswith('static/'):
-#         if path.endswith('.js'):
-#             return FileResponse(f"{file_path}/{path}", media_type='application/javascript')
-#         if path.endswith('.css'):
-#             return FileResponse(f"{file_path}/{path}", media_type='text/css')
-#     if path.endswith('.svg'):
-#         return FileResponse(f"{file_path}/{path}", media_type='image/svg+xml')
-#     if path.endswith('.js'):
-#         return FileResponse(f"{file_path}/{path}", media_type='application/javascript')
-#         # 处理字体文件
-#     if path.endswith('.woff'):
-#         return FileResponse(f"{file_path}/{path}", media_type='font/woff')
-#     if path.endswith('.woff2'):
-#         return FileResponse(f"{file_path}/{path}", media_type='font/woff2')
-#     if path.endswith('.ttf'):
-#         return FileResponse(f"{file_path}/{path}", media_type='font/ttf')
-#     if path.endswith('.eot'):
-#         return FileResponse(f"{file_path}/{path}", media_type='application/vnd.ms-fontobject')
-#     return FileResponse(f"{file_path}/index.html")
+@app.get("/{path:path}", summary="vue前端history模式路由", tags=['前端页面路由'])
+async def catch_all(path: str):
+    file_path = f"./frontend"
+    if path.startswith('static/'):
+        if path.endswith('.js'):
+            return FileResponse(f"{file_path}/{path}", media_type='application/javascript')
+        if path.endswith('.css'):
+            return FileResponse(f"{file_path}/{path}", media_type='text/css')
+    if path.endswith('.svg'):
+        return FileResponse(f"{file_path}/{path}", media_type='image/svg+xml')
+    if path.endswith('.js'):
+        return FileResponse(f"{file_path}/{path}", media_type='application/javascript')
+        # 处理字体文件
+    if path.endswith('.woff'):
+        return FileResponse(f"{file_path}/{path}", media_type='font/woff')
+    if path.endswith('.woff2'):
+        return FileResponse(f"{file_path}/{path}", media_type='font/woff2')
+    if path.endswith('.ttf'):
+        return FileResponse(f"{file_path}/{path}", media_type='font/ttf')
+    if path.endswith('.eot'):
+        return FileResponse(f"{file_path}/{path}", media_type='application/vnd.ms-fontobject')
+    return FileResponse(f"{file_path}/index.html")

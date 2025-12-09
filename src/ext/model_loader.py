@@ -78,7 +78,15 @@ class ModelLoader:
         self.unload_model()
         self.unload_tokenizer()
 
-global_model_loader = ModelLoader(FileHelper.get_file_paths(MODEL_DIR)[0])
+def get_global_model_loader():
+    try:
+        return ModelLoader(FileHelper.get_file_paths(MODEL_DIR)[0])
+    except Exception as e:
+        print(f"获取全局模型加载器失败: {e}")
+        return None
+    
+
+global_model_loader = get_global_model_loader()
 
 
 

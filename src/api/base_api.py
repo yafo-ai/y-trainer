@@ -13,9 +13,13 @@ router = APIRouter(
 
 @router.get("/current_model_name", summary="当前模型名称")
 def current_model_name():
-    model = global_model_loader.load_model()
-    model_name = model.config.name_or_path
-    return {"model_name": model_name}
+    try:
+        model = global_model_loader.load_model()
+        model_name = model.config.name_or_path
+        return {"model_name": model_name}
+    except Exception as e:
+        print(f"获取当前模型名称失败: {e}")
+        return {"model_name": ""}
 
 
 @router.get("/get_models", summary="获取所有模型")
