@@ -15,7 +15,7 @@ Y-Trainer 是一个LLM模型微调训练框架。
 
 - 🏆 **单卡强化学习**：无需依赖参考模型、教师模型，仅需基础模型+奖励函数，即可稳定的进行强化学习训练。
 
-官网介绍： [Y-Trainer](https://y-agent/docs/y-trainer/introduction)
+官网介绍： [Y-Trainer](https://y-agent.cn/docs/y-trainer/introduction)
 
 该框架包含以下三个核心组件：继续预训练（CPT）指令微调（SFT）强化学习（RL）[将**很快发布**需要配合Y-agent使用]。
 
