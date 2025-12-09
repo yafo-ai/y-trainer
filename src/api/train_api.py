@@ -95,8 +95,9 @@ async def start_train(request: TrainConfigRequest):
         is_training = True
     try:
         #卸载全局的tokenizer和model
-        global_model_loader.unload_tokenizer()
-        global_model_loader.unload_model()
+        if global_model_loader:
+            global_model_loader.unload_tokenizer()
+            global_model_loader.unload_model()
 
         # 在这里放置你真正的训练代码
         config_dict = request.model_dump()
@@ -213,8 +214,9 @@ async def eval_loss(request: EvaluateLossRequest = Body(...)):
 
     try:
         #卸载全局的tokenizer和model
-        global_model_loader.unload_tokenizer()
-        global_model_loader.unload_model()
+        if global_model_loader:
+            global_model_loader.unload_tokenizer()
+            global_model_loader.unload_model()
         import uuid
 
         dir_name, file_name = os.path.split(request.data_path)
@@ -275,8 +277,9 @@ async def merge_models(request: MergeModelsRequest = Body(...)):
     接收一个 JSON 对象作为请求体，包含合并所需的所有参数。
     """
     #卸载全局的tokenizer和model
-    global_model_loader.unload_tokenizer()
-    global_model_loader.unload_model()
+    if global_model_loader:
+        global_model_loader.unload_tokenizer()
+        global_model_loader.unload_model()
 
     merge_lora_with_base(
         base_model_path=request.base_model_path,

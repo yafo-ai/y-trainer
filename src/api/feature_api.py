@@ -1,5 +1,6 @@
+import functools
 import random
-from fastapi import APIRouter, Body, UploadFile, Form
+from fastapi import APIRouter, Body, HTTPException, UploadFile, Form
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 import torch
@@ -20,7 +21,25 @@ router = APIRouter(
     tags=['特征分析']
 )
 
+
+def check_model_loader(func):
+    """
+    装饰器：在执行被装饰的函数前，检查 global_model_loader 是否为 None。
+    如果为 None，则抛出 503 HTTPException，中断请求。
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        # 检查全局变量
+        if global_model_loader is None:
+            raise Exception("请先成功加载模型！")
+        
+        # 如果检查通过，则调用原始函数
+        return func(*args, **kwargs)
+    return wrapper
+
+
 @router.post("/clusters", summary="文本聚类")
+@check_model_loader
 def clusters_text(data:list[str] = Body(description="需要聚类的文本列表"),
                  is_attent:bool=Body(description="是否使用注意力提取特征",default=False),
                  score_threshold:int=Body(description="注意了提取多少个token特征"),default=1500):
@@ -65,6 +84,7 @@ def clusters_text(data:list[str] = Body(description="需要聚类的文本列表
 
 
 @router.post("/attention_scores", summary="计算注意力分数")
+@check_model_loader
 def attention_scores(input: str = Body(description="输入"),output: str = Body(description="输出")):
   
     
@@ -89,6 +109,7 @@ def attention_scores(input: str = Body(description="输入"),output: str = Body(
 
 
 @router.post("/loss_scores", summary="计算逐个token损失")
+@check_model_loader
 def loss_scores(input: str = Body(description="输入"),output: str = Body(description="输出")):
   
     tokenizer=global_model_loader.load_tokenizer()
@@ -112,6 +133,7 @@ def loss_scores(input: str = Body(description="输入"),output: str = Body(descr
     return response
 
 @router.post("/entropy_scores", summary="计算逐个token熵")
+@check_model_loader
 def entropy_scores(input: str = Body(description="输入"),output: str = Body(description="输出")):
   
     tokenizer=global_model_loader.load_tokenizer()
@@ -135,6 +157,7 @@ def entropy_scores(input: str = Body(description="输入"),output: str = Body(de
     return response
 
 @router.post("/compress", summary="压缩文本")
+@check_model_loader
 def attention_compress(input: str = Body(description="输入"),question: str = Body(description="问题"),kernel_num:int = Body(description="卷积核"),topk:int = Body(description="topk"),min_scroe:int = Body(description="最小分数线"),score_type:int=Body(description="分数类型1：原始分数，2：分数加权放大",default=1)):
     tokenizer=global_model_loader.load_tokenizer()
     model = global_model_loader.load_model()
@@ -148,6 +171,7 @@ def attention_compress(input: str = Body(description="输入"),question: str = B
     )
 
 @router.post("/generate_samples", summary="样本生成")
+@check_model_loader
 def generate_samples(input: str = Body(description="输入"),prompt_temp:str=Body(description="提示词模板"),generate_num:int = Body(description="生成样本数",default=5),temperature:float=Body(description="温度",default=0.1),top_p:float = Body(description="top_p",default=1.0),top_k:int = Body(description="top_k",default=0)):
 
     
@@ -169,6 +193,7 @@ def generate_samples(input: str = Body(description="输入"),prompt_temp:str=Bod
     return GenerateSamplesResponse(samples=samples,advantage_sample=advantage_sample)
 
 @router.post("/dynamic_generate_samples", summary="样本生成")
+@check_model_loader
 def dynamic_generate_samples(input: str = Body(description="输入"),prompt_temp:str=Body(description="提示词模板"),generate_num:int = Body(description="生成样本数",default=5),temperature:float=Body(description="温度",default=0.1),top_p:float = Body(description="top_p",default=1.0),top_k:int = Body(description="top_k",default=0)):
 
     

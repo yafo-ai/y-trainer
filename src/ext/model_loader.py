@@ -32,21 +32,26 @@ class ModelLoader:
                 raise Exception(f"模型路径不存在: {self.model_path}")
             if not any(os.listdir(self.model_path)):
                 raise Exception(f"模型路径为空，请先保存模型到->{self.model_path}")
-
-            self._model = AutoModelForCausalLM.from_pretrained(
-                self.model_path, 
-                device_map=self.device_map,
-                torch_dtype=self.torch_dtype,
-                attn_implementation=self.attn_implementation
-            )
+            try:
+                self._model = AutoModelForCausalLM.from_pretrained(
+                    self.model_path, 
+                    device_map=self.device_map,
+                    torch_dtype=self.torch_dtype,
+                    attn_implementation=self.attn_implementation
+                )
+            except Exception as e:
+                raise Exception(f"加载{self.model_path}模型时出错: {e}")
         return self._model
     
     def load_tokenizer(self):
         if self._tokenizer is None:
-            self._tokenizer = AutoTokenizer.from_pretrained(
-                self.model_path,
-                device_map=self.device_map
-            )
+            try:
+                self._tokenizer = AutoTokenizer.from_pretrained(
+                    self.model_path,
+                    device_map=self.device_map
+                )
+            except Exception as e:
+                raise Exception(f"加载{self.model_path}-tokenizer时出错: {e}")
         return self._tokenizer
 
     def unload_model(self):
@@ -78,7 +83,21 @@ class ModelLoader:
         self.unload_model()
         self.unload_tokenizer()
 
-global_model_loader = ModelLoader(FileHelper.get_file_paths(MODEL_DIR)[0])
+def get_global_model_loader():
+    
+    try:
+        paths=FileHelper.get_file_paths(MODEL_DIR)
+        if len(paths)>0:
+            return ModelLoader(FileHelper.get_file_paths(MODEL_DIR)[0])
+        else:
+            return ModelLoader(MODEL_DIR)
+        
+    except Exception as e:
+        print(f"获取全局模型加载器失败: {e}")
+        return None
+    
+
+global_model_loader = get_global_model_loader()
 
 
 
