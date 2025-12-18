@@ -9,6 +9,7 @@ from src.ext.attention import calculate_attention_scores
 from src.ext.clusterer import y_cluster
 from src.ext.entropy import calculate_entropy
 from src.ext.loss import calculate_loss
+from src.ext.loss_entropy_divergence_analyzer import loss_entropy_divergence_analyze
 from src.ext.utils import model_generate, model_generate_dynamic_tem
 from src.models.ext_response import AttentionScoresResponse, ClustersResponse, CompressResponse, GenerateSamplesResponse, LossResponse
 from src.ext.model_loader import global_model_loader
@@ -106,6 +107,17 @@ def attention_scores(input: str = Body(description="输入"),output: str = Body(
 
     )
     return response
+
+@router.post("/loss_entropy_analyze", summary="token异常分析")
+@check_model_loader
+def loss_entropy_analyze(input: str = Body(description="输入"),output: str = Body(description="输出"),smooth_window:int=Body(description="平滑窗口大小",default=3),z_score_threshold:float=Body(description="Z-score阈值",default=1.96),is_grenerate_output: bool = Body(description="是否生成输出", default=False)):
+    tokenizer=global_model_loader.load_tokenizer()
+    model = global_model_loader.load_model()
+    if is_grenerate_output:
+        output=model_generate(model,tokenizer,input)
+    result=loss_entropy_divergence_analyze(input, output, model, tokenizer,smooth_window,z_score_threshold)
+
+    return {"input":input,"output":output,"result":result}
 
 
 @router.post("/loss_scores", summary="计算逐个token损失")

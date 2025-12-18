@@ -194,28 +194,28 @@ class TrainConfigManager:
 
 
 
-if __name__ == "__main__":
-    args_dict = {
-        "model_path_to_load": "E:\GPT\LLM_models\Qwen2.5-0.5B-Instruct",
-        "use_lora": True,
-        "system_prompt": "You are a helpful assistant.",
-        "use_deepspeed": False,
-        "deepspeed_cfg_path": "",
-        "gradit_checkpoing": False,
-        "epoch": 3,
-        "lr": 1e-5,
-        "batch_size": 2,
-        "gradient_accumulation_steps": 1,
-        "data_path": [".\example_dataset"],
-        "output_dir": "E:\a",
-        "seed": 42,
-        "use_tensorboard": False,
-        "tensorboard_path": "",
-        "use_process_bar": True,
-        "training_type": TrainingType.SFT.value,
-        "checkpoint_epoch": [],
-        "local_rank": 0,
-        "world_size": 1,
-    }
+# if __name__ == "__main__":
+#     args_dict = {
+#         "model_path_to_load": "E:\GPT\LLM_models\Qwen2.5-0.5B-Instruct",
+#         "use_lora": True,
+#         "system_prompt": "You are a helpful assistant.",
+#         "use_deepspeed": False,
+#         "deepspeed_cfg_path": "",
+#         "gradit_checkpoing": False,
+#         "epoch": 3,
+#         "lr": 1e-5,
+#         "batch_size": 2,
+#         "gradient_accumulation_steps": 1,
+#         "data_path": [".\example_dataset"],
+#         "output_dir": "E:\a",
+#         "seed": 42,
+#         "use_tensorboard": False,
+#         "tensorboard_path": "",
+#         "use_process_bar": True,
+#         "training_type": TrainingType.SFT.value,
+#         "checkpoint_epoch": [],
+#         "local_rank": 0,
+#         "world_size": 1,
+#     }
 
-    TrainConfigManager.register_from_dict(args_dict)
+#     TrainConfigManager.register_from_dict(args_dict)

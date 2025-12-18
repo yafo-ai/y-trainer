@@ -35,7 +35,10 @@ def get_vllm_embedding(text,model,tokenizer):
     
 
 def attention(full_input_ids,model):
-    
+    torch.cuda.empty_cache()
+    import gc
+    gc.collect()
+
     attention_mask = [1] * len(full_input_ids)
     model_inputs = {
         "input_ids": torch.tensor([full_input_ids], device=model.device),
@@ -43,22 +46,48 @@ def attention(full_input_ids,model):
     }
     attentions = []
     def hook_fn(module, input, output):
-        # 捕获注意力权重（假设输出包含注意力）
-        if isinstance(output, tuple):
-            attentions.append(output[1].detach())  # 索引可能因模型而异
+        # output 通常是 tuple: (hidden_states, attention_weights, ...)
+        # attention_weights 的形状通常是 (Batch, Heads, Seq_len, Seq_len)
+        
+        # 检查 output 是否包含注意力权重 (索引通常是 1，但为了稳健可以做个判断)
+        if isinstance(output, tuple) and len(output) > 1:
+            attn_tensor = output[1] 
+            
+            # --- 关键优化 1: 立即 detach ---
+            # 切断计算图，防止梯度追踪（虽然有 no_grad，但在 hook 中显式 detach 是好习惯）
+            attn_tensor = attn_tensor.detach()
+            
+            # --- 关键优化 2: 在 GPU 上先降维 (Sum Heads) ---
+            # 原始 shape: [1, 32, 4096, 4096] (举例) -> 显存占用极大
+            # 我们只需要所有头的总和，先在 GPU 上做 sum，数据量减少几十倍 (Head数)
+            # shape 变为: [1, 4096, 4096]
+            attn_sum = attn_tensor.sum(dim=1) 
+            
+            # --- 关键优化 3: 立即转移到 CPU ---
+            # 不要把 GPU tensor 留在列表里，否则显存直到函数结束才释放
+            attentions.append(attn_sum.cpu())
+            
+            # 手动删除临时变量，协助显存释放
+            del attn_tensor
+            del attn_sum
 
     # 找到最后一层注意力模块
     last_attn_layer = model.model.layers[-1].self_attn  
     # 注册钩子
     hook = last_attn_layer.register_forward_hook(hook_fn)
     # 前向传播获取注意力权重
-    with torch.no_grad():
-        output = model(**model_inputs)
-     # 移除钩子
-    hook.remove()
-    select_attention = attentions[0]
-    attention_weights = select_attention[0].sum(dim=0) 
-    attention_weights = attention_weights.float().cpu().detach().numpy()
+    try:
+        with torch.no_grad():
+            model(**model_inputs,output_attentions=True)
+    finally:
+        # 移除钩子
+        hook.remove()
+        torch.cuda.empty_cache()
+        
+    attention_weights = attentions[0][0].float().numpy()    
+    # select_attention = attentions[0]
+    # attention_weights = select_attention[0].sum(dim=0) 
+    # attention_weights = attention_weights.float().cpu().detach().numpy()
     return attention_weights
 
 

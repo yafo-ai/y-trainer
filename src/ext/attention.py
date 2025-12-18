@@ -45,26 +45,55 @@ def calculate_attention_scores(user_input, ai_output, model, tokenizer, layers=-
     # # 获取token文本表示
     return output_attention, input_tokens, output_tokens
 
-# 使用示例
-if __name__ == "__main__":
-    # 加载模型和分词器
+# # 使用示例
+# if __name__ == "__main__":
+#     # 加载模型和分词器
 
-    model_loader = ModelLoader("")
-    model_loader.switch_model("D:\\Qwen2.5-0.5B-Instruct")
-    tokenizer=model_loader.load_tokenizer()
-    model = model_loader.load_model()
+#     model_loader = ModelLoader("")
+#     model_loader.switch_model("E:\llm_model\Qwen2.5-0.5B-Instruct","")
+#     tokenizer=model_loader.load_tokenizer()
+#     model = model_loader.load_model()
 
-    model.eval()
+#     model.eval()
     
-    # 定义输入
-    context = "# 华为 MateBook D14 2024 13代 酷睿版 笔记本-【皓 月 银】MDG-32 (14寸 i5-13420H+16G+1TB) 内存多大？"
-    output_text = "帮我"
+#     # 定义输入
+#     user_input = "你好"
+#     ai_output = "你好"
+
+
+#     full_prompt = tokenizer.apply_chat_template([{"role": "system", 'content': "You are a helpful assistant."}, {"role": "user", 'content': user_input}, {"role": "assistant", 'content': ai_output}], tokenize=False, enable_thinking=False)
+#     input_prompt = tokenizer.apply_chat_template([{"role": "system", 'content': "You are a helpful assistant."}, {"role": "user", 'content': user_input}], tokenize=False, enable_thinking=False, add_generation_prompt=True)
+#     system_prompt = tokenizer.apply_chat_template([{"role": "system", 'content': "You are a helpful assistant."}], tokenize=False, enable_thinking=False,add_generation_prompt=False)
+
+
+
+
+#     full_prompt_ids = tokenizer.encode(full_prompt, add_special_tokens=False)
+#     input_prompt_ids = tokenizer.encode(input_prompt, add_special_tokens=False)
+#     system_ids = tokenizer.encode(system_prompt, add_special_tokens=False)
+
+
+#     print("完整的输入文本:", full_prompt_ids)
+#     print("输入部分:", input_prompt_ids)
+#     print("系统提示:", system_ids)
+
+#     print("----------------------")
+#     print(tokenizer.decode(full_prompt_ids))
+#     print("----------------------")
+#     print(tokenizer.decode(input_prompt_ids))
+#     print("----------------------")
+#     print(tokenizer.decode(system_ids))
+#     print("----------------------")
+   
+#     # ai_output_start=len(input_prompt_ids)
+
+#     # ai_output_ids = full_prompt_ids[ai_output_start:]
+#     # ai_output_len = len(ai_output_ids)
+
     
-    # 计算注意力分数
-    attention_scores, input_tokens, output_tokens = calculate_attention_scores(
-        context, output_text, model, tokenizer
-    )
-    # 打印结果
-    print("输入Tokens:", input_tokens)
-    print("输出Tokens:", output_tokens)
-    print("注意力分数矩阵形状:", attention_scores.shape)
+    
+
+#     # 步骤 B: 计算不带生成提示符的用户回合长度，以确定 User 的结束位置
+#     # 注意：这里 add_generation_prompt=False，这是关键
+    
+    

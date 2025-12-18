@@ -3,6 +3,8 @@ from pydantic import BaseModel, Field
 
 class LoadDataRequest(BaseModel):
     data_path: List[str] = []
+    page_index: int = Field(-1, description="分页索引", example=0)
+    page_size: int = Field(-1, description="每页数据量", example=10)
 
 class ListDataSetRequest(BaseModel):
     data_dir: str = ""
@@ -48,20 +50,19 @@ class TrainConfigRequest(BaseModel):
 
 
 
-# 1. 为 evaluate_loss 接口创建 Pydantic 模型
-class EvaluateLossRequest(BaseModel):
-    """
-    评估模型损失的请求体模型
-    """
-    data_path: str = Field(..., description="数据集文件的路径", example="/path/to/dataset.json")
+class LossEntropyAnalyzeRequest(BaseModel):
     model_path: str = Field(..., description="待评估模型的路径", example="/path/to/model")
-    # output_path: str = Field(..., description="评估结果输出路径", example="/path/to/output.json")
-    method: str = Field(..., description="评估使用的方法", example="similarity_rank")
-    sort: bool = Field(True, description="是否对结果进行排序", example=False)
+    lora_path: str = Field("", description="LoRA 适配器的路径", example="/path/to/lora_adapter")
+    data_path: str = Field(..., description="数据集文件的路径", example="/path/to/dataset.json")
+    smooth_window: int = Field(3, description="平滑窗口大小", example=3)
+    z_score_threshold: float = Field(1.96, description="背离分数阈值", example=1.96)
+    
 
 
 class EvaluateResultRequest(BaseModel):
     output_path: str = Field(..., description="评估结果输出路径", example="/path/to/output.json")
+    page_index: int = Field(-1, description="分页索引", example=0)
+    page_size: int = Field(-1, description="每页数据量", example=10)
 
 # 2. 为 merge_models 接口创建 Pydantic 模型
 class MergeModelsRequest(BaseModel):

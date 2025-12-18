@@ -135,5 +135,5 @@ def dynamic_sigmoid_batch(losses: torch.Tensor,
     return learning_rates
 
 
-if __name__ == '__main__':
-    print(dynamic_sigmoid(0.000446))
+# if __name__ == '__main__':
+#     print(dynamic_sigmoid(0.000446))

@@ -1,6 +1,7 @@
 import gc
 import os
 import threading
+from peft import PeftModel
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
@@ -24,6 +25,7 @@ class ModelLoader:
             self.device_map=device_map
             self.attn_implementation=attn_implementation
             self._initialized = True
+            self.lora_path=""
 
     def load_model(self):
         if self._model is None:
@@ -38,7 +40,7 @@ class ModelLoader:
                     self.model_path, 
                     device_map=self.device_map,
                     torch_dtype=self.torch_dtype,
-                    attn_implementation=self.attn_implementation
+                    # attn_implementation=self.attn_implementation
                 )
             except Exception as e:
                 raise Exception(f"加载{self.model_path}模型时出错: {e}")
@@ -60,6 +62,15 @@ class ModelLoader:
             except Exception as e:
                 raise Exception(f"加载{self.model_path}-tokenizer时出错: {e}")
         return self._tokenizer
+    
+    def load_lora(self):
+        if self.lora_path != '':
+            if not os.path.exists(self.lora_path):
+                raise Exception(f"模型lora路径不存在: {self.lora_path}")
+            if not any(os.listdir(self.lora_path)):
+                raise Exception(f"模型lora_path路径为空，确保loar正确->{self.lora_path}")
+            model = PeftModel.from_pretrained(self._model, self.lora_path, is_trainable=False)
+            self._model = model
 
     def unload_model(self):
         if self._model is not None:
@@ -73,13 +84,19 @@ class ModelLoader:
             self._tokenizer = None
             gc.collect()
 
-    def switch_model(self, model_path):
+    def switch_model(self, model_path, lora_path):
         with self._lock:  # 加锁，防止并发切换
             self.unload_model()
             self.unload_tokenizer()
             self.model_path = model_path
+            self.lora_path = lora_path
             self.load_model()
+            self.load_lora()
             self.load_tokenizer()
+    def get_current_mdoel(self):
+        if self._model is not None:
+            return {"model_name": self._model.config.name_or_path,"lora_path":self.lora_path}
+        return {"model_name": "","lora_path":""}
 
     def __enter__(self):
         self.load_model()

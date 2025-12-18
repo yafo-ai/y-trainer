@@ -11,8 +11,8 @@ from fastapi.responses import JSONResponse, StreamingResponse
 import torch
 from tqdm import tqdm
 from datetime import datetime
-from src.evaluate.entropy_sort import evaluate_loss
-from src.models.train_model import EvaluateLossRequest, EvaluateResultRequest, ListDataSetRequest, LoadDataRequest, LoraRequest, MergeModelsRequest, TrainConfigRequest
+from src.ext.loss_entropy_divergence_analyzer import loss_entropy_divergence_analyze_batch
+from src.models.train_model import EvaluateResultRequest, ListDataSetRequest, LoadDataRequest, LoraRequest, LossEntropyAnalyzeRequest, MergeModelsRequest, TrainConfigRequest
 from src.train.config_manager import TrainConfigManager
 from src.train.data_loader import MultiFormatDataLoader
 from src.train.train_engine import TrainEngine, merge_lora_with_base
@@ -34,11 +34,19 @@ async def load_dataset(request: LoadDataRequest):
     loader = MultiFormatDataLoader(
             file_paths=request.data_path
         )
-    return JSONResponse(loader.load_data())
+    
+    if request.page_size>0:
+        data=loader.load_data()[request.page_size * (request.page_index-1) : request.page_size * (request.page_index)]
+    else:
+        data=loader.load_data()
+    
+    return JSONResponse(data)
 
 @router.post("/list_dataset")   
 async def list_dataset(request: ListDataSetRequest):
-    
+    """
+    列出指定目录下的所有文件信息。
+    """
     if not os.path.exists(request.data_dir):
         raise HTTPException("data_dir is not exists")
     
@@ -199,13 +207,12 @@ async def start_train(request: TrainConfigRequest):
         is_training = False
         raise Exception(str(e))
 
-@router.post("/evaluate_loss")
-async def eval_loss(request: EvaluateLossRequest = Body(...)):
+@router.post("/run_loss_entropy_divergence_analyze")
+async def run_loss_entropy_divergence_analyze(request: LossEntropyAnalyzeRequest):
     """
-    评估模型损失
-    
-    接收一个 JSON 对象作为请求体，包含评估所需的所有参数。
+    分析 Loss-Entropy 背离，返回异常片段和统计信息
     """
+
     global is_training
     async with training_lock:
         if is_training:
@@ -215,32 +222,29 @@ async def eval_loss(request: EvaluateLossRequest = Body(...)):
     try:
         #卸载全局的tokenizer和model
         if global_model_loader:
-            global_model_loader.unload_tokenizer()
-            global_model_loader.unload_model()
+            global_model_loader.switch_model(request.model_path, request.lora_path)
+
+        tokenizer=global_model_loader.load_tokenizer()
+        model = global_model_loader.load_model()
+
         import uuid
 
         dir_name, file_name = os.path.split(request.data_path)
         stem, ext = os.path.splitext(file_name)
+        ext=".jsonl"
         new_file_name = f"{stem}_{uuid.uuid4().hex}{ext}"
         output_path = os.path.join(dir_name, new_file_name)
-        # 确保输出文件总是有.json扩展名
-        if not output_path.endswith('.json'):
-            if output_path.endswith('.'):
-                output_path = output_path[:-1] + '.json'
-            else:
-                output_path += '.json'
+
+       
         async def run_evaluate_loss():
             """
             实际的训练任务函数。
             """
             try:
-                await asyncio.to_thread(lambda: evaluate_loss(
-                        data_path=request.data_path,
-                        model_path=request.model_path,
-                        output_path=output_path,
-                        method=request.method,
-                        sort=False
+               await asyncio.to_thread(lambda: loss_entropy_divergence_analyze_batch(
+                        data_path=request.data_path,output_path=output_path, model=model, tokenizer=tokenizer, smooth_window=request.smooth_window, z_score_threshold=request.z_score_threshold
                     ))
+
             finally:
                 global is_training
                 is_training = False
@@ -256,16 +260,26 @@ async def eval_loss(request: EvaluateLossRequest = Body(...)):
 @router.post("/evaluate_result")   
 async def evaluate_result(request: EvaluateResultRequest):
     """
-    评估模型损失
-    
     接收一个 JSON 对象作为请求体，包含评估所需的所有参数。
     """
     if not os.path.exists(request.output_path):
         raise Exception("评估任务完成后，才能获取评估结果")
+    data=None
     try:
-        with open(request.output_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        return JSONResponse(data)
+        with open(request.output_path, encoding="utf-8") as f:
+            if request.output_path.endswith(".json"):
+                data=json.load(f)
+            elif request.output_path.endswith(".jsonl"):
+                data=[json.loads(line) for line in f]
+            else:
+                data= list(f)
+        
+        total=len(data)
+        if request.page_size>0:
+            data=data[request.page_size * (request.page_index-1) : request.page_size * (request.page_index)]
+
+        return {"data":data,"total":total}
+    
     except Exception as e:
         raise Exception(str(e))
 
