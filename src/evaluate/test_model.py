@@ -173,6 +173,6 @@ def main():
     save_results_markdown(results, report_path)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
 

@@ -170,22 +170,22 @@ def extract_feature(context:str,phrase_token_num:int,score_threshold:int,model,t
 
 
 
-if __name__ == "__main__":
-    model_loader = ModelLoader("")
-    model_loader.switch_model("D:\\Qwen2.5-0.5B-Instruct")
-    tokenizer=model_loader.load_tokenizer()
-    model = model_loader.load_model()
+# if __name__ == "__main__":
+#     model_loader = ModelLoader("")
+#     model_loader.switch_model("D:\\Qwen2.5-0.5B-Instruct")
+#     tokenizer=model_loader.load_tokenizer()
+#     model = model_loader.load_model()
 
-    model.eval()
+#     model.eval()
     
-    # 定义输入
+#     # 定义输入
     
 
-    context = """爱普生L11058墨仓式彩色喷墨打印机（A3）[产品id:5A2679]用户：这个能自动打双面吗"""
+#     context = """爱普生L11058墨仓式彩色喷墨打印机（A3）[产品id:5A2679]用户：这个能自动打双面吗"""
 
 
-    # 计算注意力分数
-    feature_text=extract_feature(context,5,200,model, tokenizer)
+#     # 计算注意力分数
+#     feature_text=extract_feature(context,5,200,model, tokenizer)
 
-    print(feature_text)
+#     print(feature_text)
 

@@ -42,43 +42,43 @@ def y_cluster(data):
     return clusters
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     
-    data=[
-    "用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：连续能打印多长时间",
-    "用户正在浏览：爱普生L3256三合一彩色喷墨机（A4）[产品id:5A2655]用户：3253呢",
-"用户正在浏览：爱普生L11058墨仓式彩色喷墨打印机（A3）[产品id:5A2679]用户：这个能自动打双面吗？",
-"用户正在浏览：爱普生L11058墨仓式彩色喷墨打印机（A3）[产品id:5A2679]用户：自动双面吗？",
-"用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：连续打印？",
-"用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：用啥耗材",
-"用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：使用什么耗材",
-"用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：适用什么耗材？",
-"用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：耗材型号"
-  ]
+#     data=[
+#     "用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：连续能打印多长时间",
+#     "用户正在浏览：爱普生L3256三合一彩色喷墨机（A4）[产品id:5A2655]用户：3253呢",
+# "用户正在浏览：爱普生L11058墨仓式彩色喷墨打印机（A3）[产品id:5A2679]用户：这个能自动打双面吗？",
+# "用户正在浏览：爱普生L11058墨仓式彩色喷墨打印机（A3）[产品id:5A2679]用户：自动双面吗？",
+# "用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：连续打印？",
+# "用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：用啥耗材",
+# "用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：使用什么耗材",
+# "用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：适用什么耗材？",
+# "用户正在浏览：爱普生L3256三合一彩色喷墨打印机（A4）[产品id:5A2655]用户：耗材型号"
+#   ]
     
-    data_embedding = [get_vllm_embedding(text) for text in data]
+#     data_embedding = [get_vllm_embedding(text) for text in data]
 
 
 
 
-    clusters = y_cluster(data_embedding)
+#     clusters = y_cluster(data_embedding)
 
 
-    # 根据聚类信息将文本分组
-    cluster_dict = {}
-    for text, cluster in zip(data, clusters):
-        if cluster not in cluster_dict:
-            cluster_dict[cluster] = []
-        cluster_dict[cluster].append(text)
+#     # 根据聚类信息将文本分组
+#     cluster_dict = {}
+#     for text, cluster in zip(data, clusters):
+#         if cluster not in cluster_dict:
+#             cluster_dict[cluster] = []
+#         cluster_dict[cluster].append(text)
 
-    # 从每个组中随机选择一个样本
-    random_samples = [random.choice(cluster_dict[cluster]) for cluster in cluster_dict]
+#     # 从每个组中随机选择一个样本
+#     random_samples = [random.choice(cluster_dict[cluster]) for cluster in cluster_dict]
     
-    response=ClustersResponse(
-        clusters=clusters,
-        data=data,
-        random_samples=random_samples
-    )
+#     response=ClustersResponse(
+#         clusters=clusters,
+#         data=data,
+#         random_samples=random_samples
+#     )
 
-    print(response)
+#     print(response)
 
