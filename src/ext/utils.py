@@ -7,26 +7,11 @@ from src.ext.dynamic_temperature_generator import DynamicTemperatureGenerator
 
 def get_vllm_embedding(text,model,tokenizer):
 
-    # headers = {"Content-Type": "application/json"}
-    # payload = {
-    #     "input": text,
-    #     "model": model
-    # }
-    
-    # try:
-    #     response = requests.post(api_url, headers=headers, json=payload)
-    #     response.raise_for_status()  # 检查HTTP错误
-    #     return response.json()["data"][0]["embedding"]
-    # except Exception as e:
-    #     print(f"API调用失败: {str(e)}")
-    #     return None
-
-
-    input_ids = tokenizer(text, return_tensors="pt")["input_ids"]
+    input_ids = tokenizer(text, return_tensors="pt").to(model.device)["input_ids"]
     embeddings = model.get_input_embeddings()
     input_embeds = embeddings(input_ids)  # shape: [1, seq_len, hidden_size]
 
-    attention_mask = tokenizer(text, return_tensors="pt")["attention_mask"]
+    attention_mask = tokenizer(text, return_tensors="pt").to(model.device)["attention_mask"]
     sentence_embedding = torch.sum(input_embeds * attention_mask.unsqueeze(-1), dim=1) / torch.sum(attention_mask, dim=1, keepdim=True)
     embedding_list = sentence_embedding[0].tolist()
 
