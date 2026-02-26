@@ -170,9 +170,7 @@ class TrainerSFT(TrainerBase):
 
     def load_dataset(self,tokenizer)->Dataset:
         #多卡训练时，缩小原来token_batch
-        token_size=self._config.token_batch//self._config.world_size
-        if self._config.token_batch%self._config.world_size>0:
-            token_size+=1
+        token_size = (self._config.token_batch + self._config.world_size - 1) // self._config.world_size
         sample_dataset = SampleDataset(data_path=self._config.data_path, system_prompt=self._config.system_prompt,tokenizer=tokenizer,world_size=self._config.world_size,batch_size=self._config.batch_size,token_size=token_size,max_seq_len= self._config.max_seq_len)
         if self._config.local_rank == 0:
             print('token_length:', len(sample_dataset))
